@@ -247,7 +247,6 @@ public class OpMode extends LinearOpMode {
                 if(gamepad2.right_stick_y != 0)
                 {
                     elevatorTargetRight = elevator.getPosRight() - (openedXTimes * (Elevator.ELEVATOR_INCREMENT));
-                    elevatorTargetLeft = elevator.getPosLeft() - (openedXTimes * (Elevator.ELEVATOR_INCREMENT));
                 }
 
                 if (firstOuttakeAngle && (getTime() - previousElevator) >= WAIT_DELAY_TILL_OUTTAKE) {
@@ -264,14 +263,6 @@ public class OpMode extends LinearOpMode {
                     claw.setLeftClaw(Claw.ClawState.OPEN);
                 }
 
-                if(betterGamepad2.BOnce())
-                {
-                    outtake.spinOuttake(1);
-                }
-                else if(betterGamepad2.XOnce())
-                {
-                    outtake.spinOuttake(-1);
-                }
 
                 if(betterGamepad2.rightBumperOnce())
                 {

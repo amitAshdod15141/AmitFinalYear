@@ -35,23 +35,15 @@ public class RobotHardware {
     // elevator
 
     // intake
-    public BetterServo intakeClawLeftServo;
-    public BetterServo intakeClawRightServo;
-    public BetterServo intakeAngleServo;
-    public BetterServo intakeHandPivotServo;
-    public RevColorSensorV3 colorRight;
-    public RevColorSensorV3 colorLeft;
+
 
     // outake
-    public BetterServo outtakeClawLeftServo;
-    public BetterServo outtakeClawRightServo;
-    public BetterServo outtakeClawPivotServo;
-    public BetterServo outtakeHandLeftServo;
-    public BetterServo outtakeHandRightServo;
-    public BetterServo outtakeSpinServo;
+
+    public BetterServo outtakeClawServo;
+
+    public BetterServo outtakeHandServo;
 
 
-    public BetterServo planeServo;
 
     public MecanumDrive drive;
 
@@ -129,13 +121,10 @@ public class RobotHardware {
        // this.colorLeft = hardwareMap.get(RevColorSensorV3.class, "cL");
 
 
-        // OUTTAKE
         // CLAW
-        this.outtakeClawLeftServo = new BetterServo(hardwareMap.get(Servo.class, "sCL"));
-        this.outtakeClawRightServo = new BetterServo(hardwareMap.get(Servo.class, "sCR"));
-        this.outtakeClawRightServo.setDirection(Servo.Direction.REVERSE);
-        // HAND
-        this.outtakeHandLeftServo = new BetterServo(hardwareMap.get(Servo.class, "sHL"));
+
+        this.outtakeClawServo = new BetterServo(hardwareMap.get(Servo.class , "sC"));
+        this.outtakeHandServo = new BetterServo(hardwareMap.get(Servo.class, "sH"));
 
 
         voltage = hardwareMap.voltageSensor.iterator().next().getVoltage();

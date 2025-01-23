@@ -39,36 +39,30 @@ public class Elevator implements Subsystem
     {
         this.isAuto = isAuto;
         this.elevatorMotorRight = robot.hardwareMap.get(DcMotorEx.class, "mER");
-        this.elevatorMotorLeft = robot.hardwareMap.get(DcMotorEx.class, "mEL");
-        elevatorMotorLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+
 
         if(firstPID && !isAuto)
         {
             elevatorMotorRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            elevatorMotorLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         }
         else if(firstPID && isAuto)
         {
             elevatorMotorRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            elevatorMotorLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             elevatorMotorRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            elevatorMotorLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         }
         else if (isAuto)
         {
             elevatorMotorRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            elevatorMotorLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             elevatorMotorRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            elevatorMotorLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
         else
         {
             elevatorMotorRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            elevatorMotorLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
 
         this.elevatorMotorRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        this.elevatorMotorLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         this.gamepad = gamepad;
         this.cGamepad = new BetterGamepad(gamepad);
@@ -82,7 +76,7 @@ public class Elevator implements Subsystem
         pidCoefficientsL.kD = kDL;
 
         controllerR = new PIDFController(pidCoefficientsR);
-        controllerL = new PIDFController(pidCoefficientsL);
+
 
     }
 
@@ -91,14 +85,10 @@ public class Elevator implements Subsystem
         this.isAuto = isAuto;
 
         this.elevatorMotorRight = robot.hardwareMap.get(DcMotorEx.class, "mER");
-        this.elevatorMotorLeft = robot.hardwareMap.get(DcMotorEx.class, "mEL");
-        elevatorMotorLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         if (isAuto)
         {
             elevatorMotorRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            elevatorMotorLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             elevatorMotorRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            elevatorMotorLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
         else
         {
@@ -106,7 +96,6 @@ public class Elevator implements Subsystem
             elevatorMotorLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
         this.elevatorMotorRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        this.elevatorMotorLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         pidCoefficientsR.kP = kPR;
         pidCoefficientsR.kI = kIR;
@@ -117,7 +106,6 @@ public class Elevator implements Subsystem
         pidCoefficientsL.kD = kDL;
 
         controllerR = new PIDFController(pidCoefficientsR);
-        controllerL = new PIDFController(pidCoefficientsL);
     }
 
     public void setFirstPID(boolean firstPID) {
@@ -137,30 +125,25 @@ public class Elevator implements Subsystem
             else
             {
                 elevatorMotorRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                elevatorMotorLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
                 if(gamepad.right_stick_y != 0 && !gamepad.right_stick_button)
                 {
                     if((-gamepad.right_stick_y) < 0)
                     {
                         elevatorMotorRight.setPower(Range.clip(-gamepad.right_stick_y, -maxPower/2, maxPower/2));
-                        elevatorMotorLeft.setPower(Range.clip(-gamepad.right_stick_y, -maxPower/2, maxPower/2));
                     }
                     else
                     {
                         elevatorMotorRight.setPower(Range.clip(-gamepad.right_stick_y, -maxPower, maxPower));
-                        elevatorMotorLeft.setPower(Range.clip(-gamepad.right_stick_y, -maxPower, maxPower));
                     }
                 }
                 else if(gamepad.right_stick_y != 0 && gamepad.right_stick_button)
                 {
                     elevatorMotorRight.setPower(Range.clip(-gamepad.right_stick_y, -maxPower/2, maxPower/2));
-                    elevatorMotorLeft.setPower(Range.clip(-gamepad.right_stick_y, -maxPower/2, maxPower/2));
                 }
                 else
                 {
                     elevatorMotorRight.setPower(0);
-                    elevatorMotorLeft.setPower(0);
                 }
 
             }
@@ -184,10 +167,8 @@ public class Elevator implements Subsystem
     public void setPidControl()
     {
         controllerR.updateError(currentTargetRight - elevatorMotorRight.getCurrentPosition());
-        controllerL.updateError(currentTargetLeft - elevatorMotorLeft.getCurrentPosition());
 
         elevatorMotorRight.setPower(controllerR.update());
-        elevatorMotorLeft.setPower(controllerL.update());
     }
 
     public void setTarget(double target)
@@ -195,12 +176,10 @@ public class Elevator implements Subsystem
         if(target > MAX_LEVEL)
         {
             this.currentTargetRight = MAX_LEVEL;
-            this.currentTargetLeft = MAX_LEVEL;
         }
         else
         {
             this.currentTargetRight = target;
-            this.currentTargetLeft = target;
         }
     }
     //Move elevator for auto
@@ -245,15 +224,8 @@ public class Elevator implements Subsystem
         return elevatorMotorRight.getCurrentPosition();
     }
 
-    public double getPosLeft()
-    {
-        return elevatorMotorLeft.getCurrentPosition();
-    }
 
-    public double getPos()
-    {
-        return (getPosLeft() + getPosRight()) / 2;
-    }
+    public double getPos() { return ( getPosRight()); }
 
     public void setUsePID(boolean usePID) {
         this.usePID = usePID;
@@ -284,7 +256,5 @@ public class Elevator implements Subsystem
         return controllerR;
     }
 
-    public PIDFController getControllerL() {
-        return controllerL;
-    }
+
 }

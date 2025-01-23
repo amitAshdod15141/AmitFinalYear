@@ -83,63 +83,43 @@ public class Outtake implements Subsystem {
                 switch (angle) {
                     case INTAKE:
                     case ALMOST_INTAKE:
-                        this.robot.outtakeClawPivotServo.setPosition(intakeClawPivot);
-                        this.robot.outtakeSpinServo.setPosition(outtakeSpinIntake);
+                        this.robot.outtakeClawServo.setPosition(intakeClawPivot);
                         break;
                     case OUTTAKE:
-                        this.robot.outtakeClawPivotServo.setPosition(outtakeClawPivot);
-                        this.robot.outtakeSpinServo.setPosition(outtakeSpinOuttake);
-                        break;
-                    case FLOOR:
-                        this.robot.outtakeClawPivotServo.setPosition(floorClawPivot);
-                        break;
-                    case HANG:
-                        this.robot.outtakeClawPivotServo.setPosition(handClaw);
+                        this.robot.outtakeClawServo.setPosition(outtakeClawPivot);
                         break;
                     case RELEASE_STACK:
-                        this.robot.outtakeClawPivotServo.setPosition(releaseStackClaw);
+                        this.robot.outtakeClawServo.setPosition(releaseStackClaw);
                         break;
                 }
                 break;
             case HAND:
                 switch (angle) {
                     case ALMOST_INTAKE:
-                        this.robot.outtakeHandLeftServo.setPosition(almostIntakeHandPivot);
-                        this.robot.outtakeHandRightServo.setPosition(almostIntakeHandPivot);
+                        this.robot.outtakeHandServo.setPosition(almostIntakeHandPivot);
+
                         break;
                     case INTAKE:
-                        this.robot.outtakeHandLeftServo.setPosition(intakeHandPivot);
-                        this.robot.outtakeHandRightServo.setPosition(intakeHandPivot);
+                        this.robot.outtakeHandServo.setPosition(intakeHandPivot);
+
                         break;
                     case OUTTAKE:
-                        this.robot.outtakeHandLeftServo.setPosition(outtakeHandPivot);
-                        this.robot.outtakeHandRightServo.setPosition(outtakeHandPivot);
+                        this.robot.outtakeHandServo.setPosition(outtakeHandPivot);
                         break;
                     case FLOOR:
-                        this.robot.outtakeHandRightServo.setPosition(floorHandPivot);
-                        this.robot.outtakeHandLeftServo.setPosition(floorHandPivot);
+                        this.robot.outtakeHandServo.setPosition(floorHandPivot);
                         break;
                     case HANG:
-                        this.robot.outtakeHandRightServo.setPosition(hangHand);
-                        this.robot.outtakeHandLeftServo.setPosition(hangHand);
+                        this.robot.outtakeHandServo.setPosition(hangHand);
                         break;
                     case RELEASE_STACK:
-                        this.robot.outtakeHandRightServo.setPosition(releaseStackHand);
-                        this.robot.outtakeHandLeftServo.setPosition(releaseStackHand);
+                        this.robot.outtakeHandServo.setPosition(releaseStackHand);
                         break;
                 }
                 break;
         }
     }
 
-    public void spinOuttake(int direction)
-    {
-        outtakeSpinOuttake += (outtakeSpin45 * direction);
-
-        outtakeSpinOuttake = Math.max(0, Math.min(1, outtakeSpinOuttake));
-
-        this.robot.outtakeSpinServo.setPosition(outtakeSpinOuttake);
-    }
 
     public void releasePixel()
     {

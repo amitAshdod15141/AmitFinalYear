@@ -57,19 +57,19 @@ public class Claw implements Subsystem {
 
         switch (side) {
             case LEFT:
-                robot.outtakeClawLeftServo.setPosition(position);
+                robot.outtakeClawServo.setPosition(position);
                 this.leftClaw = state;
                 break;
             case RIGHT:
-                robot.outtakeClawRightServo.setPosition(position);
+                robot.outtakeClawServo.setPosition(position);
                 this.rightClaw = state;
                 break;
             case BOTH:
                 position = getClawStatePosition(state, ClawSide.LEFT);
-                robot.outtakeClawLeftServo.setPosition(position);
+                robot.outtakeClawServo.setPosition(position);
                 this.leftClaw = state;
                 position = getClawStatePosition(state, ClawSide.RIGHT);
-                robot.outtakeClawRightServo.setPosition(position);
+                robot.outtakeClawServo.setPosition(position);
                 this.rightClaw = state;
                 break;
         }
