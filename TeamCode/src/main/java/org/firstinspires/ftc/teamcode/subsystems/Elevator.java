@@ -30,7 +30,7 @@ public class Elevator implements Subsystem
     public DcMotorEx elevatorMotorLeft;
     Gamepad gamepad;
     BetterGamepad cGamepad;
-    PIDFController controllerR, controllerL;
+    PIDFController controller;
     PIDFController.PIDCoefficients pidCoefficientsR = new PIDFController.PIDCoefficients();
     PIDFController.PIDCoefficients pidCoefficientsL = new PIDFController.PIDCoefficients();
 
@@ -75,7 +75,7 @@ public class Elevator implements Subsystem
         pidCoefficientsL.kI = kIL;
         pidCoefficientsL.kD = kDL;
 
-        controllerR = new PIDFController(pidCoefficientsR);
+        controller = new PIDFController(pidCoefficientsR);
 
 
     }
@@ -105,7 +105,7 @@ public class Elevator implements Subsystem
         pidCoefficientsL.kI = kIL;
         pidCoefficientsL.kD = kDL;
 
-        controllerR = new PIDFController(pidCoefficientsR);
+        controller = new PIDFController(pidCoefficientsR);
     }
 
     public void setFirstPID(boolean firstPID) {
@@ -166,9 +166,9 @@ public class Elevator implements Subsystem
 //    }
     public void setPidControl()
     {
-        controllerR.updateError(currentTargetRight - elevatorMotorRight.getCurrentPosition());
+        controller.updateError(currentTargetRight - elevatorMotorRight.getCurrentPosition());
 
-        elevatorMotorRight.setPower(controllerR.update());
+        elevatorMotorRight.setPower(controller.update());
     }
 
     public void setTarget(double target)
@@ -252,8 +252,8 @@ public class Elevator implements Subsystem
 
     }
 
-    public PIDFController getControllerR() {
-        return controllerR;
+    public PIDFController getController() {
+        return controller;
     }
 
 

@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.Range;
 
@@ -18,7 +19,7 @@ public class Drivetrain{
 
     private final RobotHardware robot;
     public static double maxPower = 1;
-    public static double slowerSpin = 0.5;
+    public static double slowerSpin = 0.8;
     public double power = 0, twist = 0;
     double botHeading = 0, y = 0, x = 0, rotY = 0, rotX = 0;
 
@@ -40,6 +41,7 @@ public class Drivetrain{
     public void update() {
         _cGamepad1.update();
 
+
         y = Range.clip(-_cGamepad1.left_stick_y, -power, power); // Remember, Y stick value is reversed
         x = Range.clip(_cGamepad1.left_stick_x, -power, power);
         twist = Range.clip(_cGamepad1.right_stick_x, -power * slowerSpin, power * slowerSpin);
@@ -48,21 +50,21 @@ public class Drivetrain{
             robot.imu.resetYaw();
         }
 
-        botHeading = robot.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) + robot.getImuOffset();
+        double botHeading = robot.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
         // Rotate the movement direction counter to the bot's rotation
-        rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
-        rotY = x * Math.sin(-botHeading) + y * Math.cos(-botHeading);
+        double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
+        double rotY = x * Math.sin(-botHeading) + y * Math.cos(-botHeading);
 
         rotX = rotX * 1.1;  // Counteract imperfect strafing
 
-        robot.dtFrontLeftMotor.setPower(rotY + rotX + twist);
-        robot.dtBackLeftMotor.setPower(rotY - rotX + twist);
-        robot.dtFrontRightMotor.setPower(rotY - rotX - twist);
-        robot.dtBackRightMotor.setPower(rotY + rotX - twist);
+
+        robot.dtFrontRightMotor.setPower(- rotY - rotX + twist) ;
+        robot.dtBackRightMotor.setPower(-rotY + rotX + twist) ;
+        robot.dtFrontLeftMotor.setPower(- rotY + rotX - twist) ;
+        robot.dtBackLeftMotor.setPower(- rotY - rotX - twist) ;
+
     }
-
-
     public void resetAngle(boolean debug)
     {
         robot.imu.resetYaw();

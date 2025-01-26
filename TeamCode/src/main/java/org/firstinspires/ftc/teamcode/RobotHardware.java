@@ -4,10 +4,13 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -34,20 +37,18 @@ public class RobotHardware {
     public DcMotorEx dtBackRightMotor;
     // elevator
 
-    // intake
-
+    public RevColorSensorV3 colorRight;
+    public RevColorSensorV3 colorLeft;
 
     // outake
 
-    public BetterServo outtakeClawServo;
-
     public BetterServo outtakeHandServo;
 
+    public BetterServo outtakeClawServo;
 
 
     public MecanumDrive drive;
 
-    // TODO: ADD x3 Distance Sensors, webcam
 
     // Telemetry storage
     public Telemetry telemetry;
@@ -64,6 +65,11 @@ public class RobotHardware {
     private ArrayList<BetterSubsystem> subsystems;
 
     private double imuAngle, imuOffset = 0;
+
+
+
+
+
 
 
     boolean has2Pixels = false, closeRight = false, closeLeft = false;
@@ -85,7 +91,7 @@ public class RobotHardware {
      * @param hardwareMap The HardwareMap of the robot, storing all hardware devices
      * @param telemetry Saved for later in the event FTC Dashboard used
      */
-    public void init(final HardwareMap hardwareMap, final Telemetry telemetry, Pose2d pose )  {
+    public void init(final HardwareMap hardwareMap, final Telemetry telemetry, Pose2d pose) {
         this.hardwareMap = hardwareMap;
 
         drive = new MecanumDrive(hardwareMap, pose);
@@ -97,37 +103,45 @@ public class RobotHardware {
 
         this.imu = drive.lazyImu.get();
 
+
         // DRIVETRAIN
         this.dtBackLeftMotor = hardwareMap.get(DcMotorEx.class, "mBL");
         this.dtBackLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        this.dtBackLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
+
 
         this.dtFrontLeftMotor = hardwareMap.get(DcMotorEx.class, "mFL");
         this.dtFrontLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        this.dtFrontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
+
 
         this.dtBackRightMotor = hardwareMap.get(DcMotorEx.class, "mBR");
         this.dtBackRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         this.dtBackRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
+
         this.dtFrontRightMotor = hardwareMap.get(DcMotorEx.class, "mFR");
         this.dtFrontRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        this.dtFrontRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
 
-        // COLOR/DS SENSORS
 
-        //this.colorRight = hardwareMap.get(RevColorSensorV3.class, "cR");
-       // this.colorLeft = hardwareMap.get(RevColorSensorV3.class, "cL");
+        // OUTTAKE
 
+        this.outtakeClawServo = new BetterServo(hardwareMap.get(Servo.class, "sC"));
+        this.outtakeClawServo.setDirection(Servo.Direction.REVERSE);
 
-        // CLAW
-
-        this.outtakeClawServo = new BetterServo(hardwareMap.get(Servo.class , "sC"));
+        // HAND
         this.outtakeHandServo = new BetterServo(hardwareMap.get(Servo.class, "sH"));
+        this.outtakeHandServo.setDirection(Servo.Direction.REVERSE);
 
 
         voltage = hardwareMap.voltageSensor.iterator().next().getVoltage();
+
+
+
+
     }
 
     public void init(final HardwareMap hardwareMap, final Telemetry telemetry)
