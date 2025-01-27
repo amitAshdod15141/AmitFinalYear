@@ -39,24 +39,18 @@ public class DebugOpMode extends LinearOpMode {
     BetterGamepad betterGamepad1, betterGamepad2;
 
     // delays
-    public static double delayTransfer = 300, delayRelease = 1100, delayCloseTransfer = 350, XDelay = 500, goToIntakeDelay = 50, goToAlmostIntakeDelay = 250;
-    public static double WAIT_DELAY_TILL_OUTTAKE = 150, WAIT_DELAY_TILL_CLOSE = 250, ELEVATOR_ZERO = 10, COOL_DOWN = 350;
-    public static double DEFAULT_INTAKE_EXTEND_PRECENTAGE = 42.5, SHORT_INTAKE_EXTEND_PRECENTAGE = 25, delayReleaseFromIntake = 200;
+
+    public static double WAIT_DELAY_TILL_OUTTAKE = 150, WAIT_DELAY_TILL_CLOSE = 250, COOL_DOWN = 350;
+    public static double DEFAULT_INTAKE_EXTEND_PRECENTAGE = 42.5, SHORT_INTAKE_EXTEND_PRECENTAGE = 25;
     // variables
-    double elevatorReset = 0, previousElevator = 0, transferTimer = 0, releaseTimer = 0, closeTransferTimer = 0, goToTransferTimer = 0, goToIntakeTimer = 0, goToAlmostIntakeTimer = 0;
-    double elevatorTargetRight = 800, intakePrecentage = DEFAULT_INTAKE_EXTEND_PRECENTAGE, releaseFromIntake = 0, startXDelay = 0, cooldown = 0;
+    double elevatorReset = 0, previousElevator = 0;
+    double elevatorTarget = 800, intakePrecentage = DEFAULT_INTAKE_EXTEND_PRECENTAGE, startXDelay = 0, cooldown = 0;
     double elevatorTargetLeft = 800;
     int openedXTimes = 0, ACount = 0;
-    boolean firstOuttakeAngle = true, retract = false,  goToMid = false, intakeMid = true, canIntake = true, startedDelayTransfer = false, heldExtension = false, firstReleaseThreeTimer = true;
-    boolean override = false, had2Pixels = false, hang = false, resetRightTrigger = true, closeClaw = false, wasClosed = false, firstExtend = true, XPressed = false;
-    boolean overrideIntakeExtension = false, movedStack = false, outtakeToOuttake = true, firstReleaseThree = true, firstOuttake = true, goToIntake = false, goToAlmostIntake = false;
+    boolean firstOuttakeAngle = true, retract = false, canIntake = true;
+    boolean hang = false,  XPressed = false;
+    boolean  firstOuttake = true;
     boolean rightClaw = true, leftClaw = true;
-    public enum IntakeState {
-        RETRACT,
-        RELEASE,
-        INTAKE,
-        INTAKE_EXTEND
-    }
 
     public enum OuttakeState {
         OUTTAKE,
@@ -66,19 +60,12 @@ public class DebugOpMode extends LinearOpMode {
     public enum LiftState {
         RETRACT,
         EXTRACT,
-        STUCK_3,
+        STUCK_2,
         HANG
     }
 
-    enum IntakeLevel
-    {
-        TOP_54,
-        TOP_32,
-        INTAKE
-    }
 
-    IntakeLevel intakeLevel = IntakeLevel.INTAKE;
-    IntakeState intakeState = IntakeState.RETRACT;
+
     LiftState liftState = LiftState.RETRACT;
     OuttakeState outtakeState = OuttakeState.OUTTAKE;
 
@@ -157,7 +144,6 @@ public class DebugOpMode extends LinearOpMode {
                 drivetrain.maxPower = 0.9;
             }
 
-            changeIntakeLevels();
             elevatorStateMachine();
 
 
@@ -167,24 +153,7 @@ public class DebugOpMode extends LinearOpMode {
         }
     }
 
-    void changeIntakeLevels()
-    {
-        if(betterGamepad2.YOnce() && liftState != LiftState.EXTRACT)
-        {
-            intakePrecentage = SHORT_INTAKE_EXTEND_PRECENTAGE;
-            intakeLevel = IntakeLevel.TOP_54;
-        }
-        else if(betterGamepad2.BOnce() && liftState != LiftState.EXTRACT)
-        {
-            intakePrecentage = SHORT_INTAKE_EXTEND_PRECENTAGE;
-            intakeLevel = IntakeLevel.TOP_32;
-        }
-        else if(betterGamepad2.AOnce() && liftState != LiftState.EXTRACT)
-        {
-            intakePrecentage = DEFAULT_INTAKE_EXTEND_PRECENTAGE;
-            intakeLevel = IntakeLevel.INTAKE;
-        }
-    }
+
 
 
     void elevatorStateMachine()
@@ -208,7 +177,7 @@ public class DebugOpMode extends LinearOpMode {
                 }
                 else if(betterGamepad2.XOnce())
                 {
-                    liftState = LiftState.STUCK_3;
+                    liftState = LiftState.STUCK_2;
                 }
                 break;
             case EXTRACT:
@@ -216,26 +185,14 @@ public class DebugOpMode extends LinearOpMode {
                 leftClaw = true;
                 rightClaw = true;
 
-                if(firstOuttake)
-                {
-                    claw.setBothClaw(Claw.ClawState.CLOSED);
-                    firstOuttake = false;
-                }
-                canIntake = false;
-                intakeState = IntakeState.RETRACT;
+                elevatorTarget = elevator.MAX_LEVEL;
 
-                if(retract)
-                {
-                    elevator.setTarget(elevatorTargetRight + (openedXTimes * (Elevator.ELEVATOR_INCREMENT * 3.5)), elevatorTargetLeft + (openedXTimes * (Elevator.ELEVATOR_INCREMENT * 3.5)));
-                }
-                else
-                {
-                    elevator.setTarget(elevatorTargetRight + (openedXTimes * (Elevator.ELEVATOR_INCREMENT)), elevatorTargetLeft + (openedXTimes * (Elevator.ELEVATOR_INCREMENT)));
-                }
+                canIntake = false;
+
 
                 if(gamepad2.right_stick_y != 0)
                 {
-                    elevatorTargetRight = elevator.getPosRight() - (openedXTimes * (Elevator.ELEVATOR_INCREMENT));
+                    elevatorTarget= elevator.getPos() - (openedXTimes * (Elevator.ELEVATOR_INCREMENT));
                 }
 
                 if (firstOuttakeAngle && (getTime() - previousElevator) >= WAIT_DELAY_TILL_OUTTAKE) {
@@ -256,25 +213,25 @@ public class DebugOpMode extends LinearOpMode {
 
                 if(betterGamepad2.rightBumperOnce())
                 {
-                    elevatorTargetRight += 150;
+                    elevatorTarget += 150;
                     elevatorTargetLeft += 150;
                     coolDownReset();
                 }
                 else if(betterGamepad2.leftBumperOnce())
                 {
-                    elevatorTargetRight -= 150;
+                    elevatorTarget -= 150;
                     elevatorTargetLeft -= 150;
                     coolDownReset();
                 }
                 else if(betterGamepad2.dpadLeftOnce())
                 {
-                    elevatorTargetRight -= 415;
+                    elevatorTarget -= 415;
                     elevatorTargetLeft -= 415;
                     coolDownReset();
                 }
                 else if(betterGamepad2.dpadRightOnce())
                 {
-                    elevatorTargetRight += 415;
+                    elevatorTarget += 415;
                     elevatorTargetLeft += 415;
                     coolDownReset();
                 }
@@ -295,8 +252,6 @@ public class DebugOpMode extends LinearOpMode {
                 if ((ACount > 1 && cooldowned()) || (betterGamepad2.shareOnce() && cooldowned()))  {
                     claw.setBothClaw(Claw.ClawState.OPEN);
 
-//                    elevatorTargetRight = elevator.getTargetRight() - (openedXTimes * Elevator.ELEVATOR_INCREMENT);
-//                    elevatorTargetLeft = elevator.getTargetLeft() - (openedXTimes * Elevator.ELEVATOR_INCREMENT);
                     openedXTimes++;
 
 
@@ -313,17 +268,18 @@ public class DebugOpMode extends LinearOpMode {
                 }
                 break;
             case HANG:
+                elevatorTarget = elevator.HANG;
 
                 outtake.setAngle(Outtake.Angle.HANG);
 
                 if(betterGamepad2.rightBumperOnce())
                 {
-                    elevatorTargetRight += 100;
+                    elevatorTarget += 100;
                     elevatorTargetLeft += 100;
                 }
                 else if(betterGamepad2.leftBumperOnce())
                 {
-                    elevatorTargetRight -= 100;
+                    elevatorTarget -= 100;
                     elevatorTargetLeft -= 100;
                 }
 
@@ -348,7 +304,9 @@ public class DebugOpMode extends LinearOpMode {
                     outtake.setAngle(Outtake.Angle.INTAKE);
                 }
                 break;
-            case STUCK_3:
+            case STUCK_2:
+
+                elevatorTarget = elevator.MAX_LEVEL;
                 outtake.setAngle(Outtake.Angle.OUTTAKE);
 
 

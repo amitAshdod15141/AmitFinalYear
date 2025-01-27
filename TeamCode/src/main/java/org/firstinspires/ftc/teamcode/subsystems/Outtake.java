@@ -9,15 +9,13 @@ public class Outtake implements Subsystem {
 
     private final RobotHardware robot;
 
-    public static double almostIntakeHandPivot = 0.35, intakeHandPivot = 0.22, intakeClawPivot = 0.25;
-    public static double outtakeHandPivot = 0.7, outtakeClawPivot = .675;
-    public static double floorHandPivot = 0.85, floorClawPivot = 0.5, goBackRelease = 0.05;
+    public static double almostIntakeHandPivot = 0.35, intakeHandPivot = 0.22;
+    public static double outtakeHandPivot = 0.7;
+    public static double floorHandPivot = 0.85, goBackRelease = 0.05;
 
-    public static double releaseStackHand = 0.65 , releaseStackClaw = .4;
-    public static double outtakeSpinIntake = 0.87, outtakeSpinOuttake = 0.88, outtakeSpin45 = 0.1505;
-    double defaultOuttakeSpinOuttake = 0.875, defaultOuttakeHandPivot = 0.7;
-    public static double outtakeSpinDouble = 0.0325;
-    public static double hangHand = 0.6, handClaw = .4;
+    public static double releaseSampleHand = 0.65 ;
+    public static double defaultOuttakeHandPivot = 0.7;
+    public static double hangHand = 0.6;
 
     public static double power = 1;
 
@@ -46,12 +44,11 @@ public class Outtake implements Subsystem {
         OUTTAKE,
         FLOOR,
         HANG,
-        RELEASE_STACK
+        RELEASE_SAMPLE
 
     }
 
     public enum Type {
-        CLAW,
         HAND
     }
 
@@ -64,7 +61,6 @@ public class Outtake implements Subsystem {
 
     public void update() {
         updateState(Type.HAND);
-        updateState(Type.CLAW);
 
     }
 
@@ -72,27 +68,13 @@ public class Outtake implements Subsystem {
         this.angle = angle;
 
         updateState(Type.HAND);
-        updateState(Type.CLAW);
     }
 
     public void updateState(@NotNull Type type) {
 
 
         switch (type) {
-            case CLAW:
-                switch (angle) {
-                    case INTAKE:
-                    case ALMOST_INTAKE:
-                        this.robot.outtakeClawServo.setPosition(intakeClawPivot);
-                        break;
-                    case OUTTAKE:
-                        this.robot.outtakeClawServo.setPosition(outtakeClawPivot);
-                        break;
-                    case RELEASE_STACK:
-                        this.robot.outtakeClawServo.setPosition(releaseStackClaw);
-                        break;
-                }
-                break;
+
             case HAND:
                 switch (angle) {
                     case ALMOST_INTAKE:
@@ -112,8 +94,8 @@ public class Outtake implements Subsystem {
                     case HANG:
                         this.robot.outtakeHandServo.setPosition(hangHand);
                         break;
-                    case RELEASE_STACK:
-                        this.robot.outtakeHandServo.setPosition(releaseStackHand);
+                    case RELEASE_SAMPLE:
+                        this.robot.outtakeHandServo.setPosition(releaseSampleHand);
                         break;
                 }
                 break;
@@ -127,7 +109,7 @@ public class Outtake implements Subsystem {
     }
     public void resetOuttake()
     {
-        outtakeSpinOuttake = defaultOuttakeSpinOuttake;
+
         outtakeHandPivot = defaultOuttakeHandPivot;
     }
 

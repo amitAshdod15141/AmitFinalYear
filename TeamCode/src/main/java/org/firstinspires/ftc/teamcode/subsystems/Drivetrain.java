@@ -59,10 +59,10 @@ public class Drivetrain{
         rotX = rotX * 1.1;  // Counteract imperfect strafing
 
 
-        robot.dtFrontRightMotor.setPower(rotY + rotX + twist) ;
-        robot.dtBackRightMotor.setPower(rotY - rotX + twist) ;
-        robot.dtFrontLeftMotor.setPower(rotY - rotX - twist) ;
-        robot.dtBackLeftMotor.setPower(rotY + rotX - twist) ;
+        robot.dtFrontRightMotor.setPower(rotY - rotX - twist) ;
+        robot.dtBackRightMotor.setPower(rotY + rotX - twist) ;
+        robot.dtFrontLeftMotor.setPower(rotY + rotX + twist) ;
+        robot.dtBackLeftMotor.setPower(rotY - rotX + twist) ;
 
     }
     public void resetAngle(boolean debug)
