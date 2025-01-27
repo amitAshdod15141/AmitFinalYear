@@ -50,7 +50,7 @@ public class Drivetrain{
             robot.imu.resetYaw();
         }
 
-        double botHeading = robot.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        double botHeading = robot.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) + robot.getImuOffset();
 
         // Rotate the movement direction counter to the bot's rotation
         double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
@@ -59,10 +59,10 @@ public class Drivetrain{
         rotX = rotX * 1.1;  // Counteract imperfect strafing
 
 
-        robot.dtFrontRightMotor.setPower(- rotY - rotX + twist) ;
-        robot.dtBackRightMotor.setPower(-rotY + rotX + twist) ;
-        robot.dtFrontLeftMotor.setPower(- rotY + rotX - twist) ;
-        robot.dtBackLeftMotor.setPower(- rotY - rotX - twist) ;
+        robot.dtFrontRightMotor.setPower(rotY - rotX + twist) ;
+        robot.dtBackRightMotor.setPower(rotY + rotX + twist) ;
+        robot.dtFrontLeftMotor.setPower(rotY + rotX - twist) ;
+        robot.dtBackLeftMotor.setPower(rotY - rotX - twist) ;
 
     }
     public void resetAngle(boolean debug)
