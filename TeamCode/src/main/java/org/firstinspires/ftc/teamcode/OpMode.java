@@ -61,7 +61,10 @@ public class OpMode extends LinearOpMode {
 
     public enum LiftState {
         RETRACT,
-        EXTRACT,
+        EXTRACT_HIGH,
+        EXTRACT_LOW,
+        EXTRACT_HIGH_BASKET,
+        EXTRACT_LOW_BAKSET,
         STUCK_2,
         HANG
     }
@@ -189,8 +192,16 @@ public class OpMode extends LinearOpMode {
                 {
                     previousElevator = getTime();
                     claw.setBothClaw(Claw.ClawState.CLOSED);
-                    liftState = LiftState.EXTRACT;
+                    liftState = LiftState.EXTRACT_HIGH;
                 }
+
+                if(betterGamepad1.XOnce())
+                {
+                    previousElevator = getTime();
+                    claw.setBothClaw(Claw.ClawState.CLOSED);
+                    liftState = LiftState.EXTRACT_HIGH_BASKET;
+                }
+
                 else if(betterGamepad2.dpadUpOnce())
                 {
                     liftState = LiftState.HANG;
@@ -200,9 +211,14 @@ public class OpMode extends LinearOpMode {
                     liftState = LiftState.STUCK_2;
                 }
                 break;
-            case EXTRACT:
+            case EXTRACT_HIGH:
 
-                elevatorTarget = elevator.MAX_LEVEL;
+                if (betterGamepad1.YOnce())
+                {
+                    liftState = LiftState.EXTRACT_LOW;
+                }
+
+                elevator.setTarget(elevator.HIGH_EXTRACT_LEVEL);
 
                 if(gamepad2.right_stick_y != 0)
                 {
@@ -271,6 +287,232 @@ public class OpMode extends LinearOpMode {
                     liftState = LiftState.RETRACT;
                 }
                 break;
+
+            case EXTRACT_LOW:
+
+
+
+                elevator.setTarget(elevator.LOW_BASKET_LEVEL);
+
+
+                if(gamepad2.right_stick_y != 0)
+                {
+                    elevatorTarget = elevator.getPos() - (openedXTimes * (Elevator.ELEVATOR_INCREMENT));
+                }
+
+                if ((getTime() - previousElevator) >= WAIT_DELAY_TILL_OUTTAKE) {
+                    outtake.setAngle(Outtake.Angle.OUTTAKE);
+                }
+
+                if(betterGamepad1.dpadRightOnce() && cooldowned())
+                {
+                    claw.setRightClaw(Claw.ClawState.OPEN);
+                }
+
+
+                if(betterGamepad2.rightBumperOnce())
+                {
+                    elevatorTarget += 150;
+                    coolDownReset();
+                }
+                else if(betterGamepad2.leftBumperOnce())
+                {
+                    elevatorTarget -= 150;
+                    coolDownReset();
+                }
+                else if(betterGamepad2.dpadLeftOnce())
+                {
+                    elevatorTarget -= 415;
+                    coolDownReset();
+                }
+                else if(betterGamepad2.dpadRightOnce())
+                {
+                    elevatorTarget += 415;
+                    coolDownReset();
+                }
+
+                if(betterGamepad2.touchpadOnce())
+                {
+                    switchOuttake();
+                }
+
+                if(betterGamepad1.YOnce() || betterGamepad1.AOnce())
+                {
+                    claw.setBothClaw(Claw.ClawState.OPEN);
+
+                    ACount++;
+
+                }
+
+                if ((ACount > 1 && cooldowned()) || (betterGamepad2.shareOnce() && cooldowned()))  {
+                    claw.setBothClaw(Claw.ClawState.OPEN);
+
+                    openedXTimes++;
+
+
+                    elevatorReset = getTime();
+                    retract = true;
+                    ACount = 0;
+                } else if ((getTime() - elevatorReset) >= WAIT_DELAY_TILL_CLOSE && retract)
+                {
+                    retract = false;
+                    firstOuttakeAngle = true;
+                    outtake.resetOuttake();
+                    outtake.setAngle(Outtake.Angle.INTAKE);
+                    liftState = LiftState.RETRACT;
+                }
+                break;
+
+            case EXTRACT_HIGH_BASKET:
+
+              if (betterGamepad1.XOnce())
+              {
+                  liftState = LiftState.EXTRACT_LOW_BAKSET;
+
+              }
+                elevator.setTarget(elevator.HIGH_BASKET_LEVEL);
+
+
+                if(gamepad2.right_stick_y != 0)
+                {
+                    elevatorTarget = elevator.getPos() - (openedXTimes * (Elevator.ELEVATOR_INCREMENT));
+                }
+
+                if ((getTime() - previousElevator) >= WAIT_DELAY_TILL_OUTTAKE) {
+                    outtake.setAngle(Outtake.Angle.OUTTAKE);
+                }
+
+                if(betterGamepad1.dpadRightOnce() && cooldowned())
+                {
+                    claw.setRightClaw(Claw.ClawState.OPEN);
+                }
+
+
+                if(betterGamepad2.rightBumperOnce())
+                {
+                    elevatorTarget += 150;
+                    coolDownReset();
+                }
+                else if(betterGamepad2.leftBumperOnce())
+                {
+                    elevatorTarget -= 150;
+                    coolDownReset();
+                }
+                else if(betterGamepad2.dpadLeftOnce())
+                {
+                    elevatorTarget -= 415;
+                    coolDownReset();
+                }
+                else if(betterGamepad2.dpadRightOnce())
+                {
+                    elevatorTarget += 415;
+                    coolDownReset();
+                }
+
+                if(betterGamepad2.touchpadOnce())
+                {
+                    switchOuttake();
+                }
+
+                if(betterGamepad1.YOnce() || betterGamepad1.AOnce())
+                {
+                    claw.setBothClaw(Claw.ClawState.OPEN);
+
+                    ACount++;
+
+                }
+
+                if ((ACount > 1 && cooldowned()) || (betterGamepad2.shareOnce() && cooldowned()))  {
+                    claw.setBothClaw(Claw.ClawState.OPEN);
+
+                    openedXTimes++;
+
+
+                    elevatorReset = getTime();
+                    retract = true;
+                    ACount = 0;
+                } else if ((getTime() - elevatorReset) >= WAIT_DELAY_TILL_CLOSE && retract)
+                {
+                    retract = false;
+                    firstOuttakeAngle = true;
+                    outtake.resetOuttake();
+                    outtake.setAngle(Outtake.Angle.INTAKE);
+                    liftState = LiftState.RETRACT;
+                }
+                break;
+
+            case EXTRACT_LOW_BAKSET:
+
+                elevator.setTarget(elevator.LOW_BASKET_LEVEL);
+
+
+                if(gamepad2.right_stick_y != 0)
+                {
+                    elevatorTarget = elevator.getPos() - (openedXTimes * (Elevator.ELEVATOR_INCREMENT));
+                }
+
+                if ((getTime() - previousElevator) >= WAIT_DELAY_TILL_OUTTAKE) {
+                    outtake.setAngle(Outtake.Angle.OUTTAKE);
+                }
+
+                if(betterGamepad1.dpadRightOnce() && cooldowned())
+                {
+                    claw.setRightClaw(Claw.ClawState.OPEN);
+                }
+
+
+                if(betterGamepad2.rightBumperOnce())
+                {
+                    elevatorTarget += 150;
+                    coolDownReset();
+                }
+                else if(betterGamepad2.leftBumperOnce())
+                {
+                    elevatorTarget -= 150;
+                    coolDownReset();
+                }
+                else if(betterGamepad2.dpadLeftOnce())
+                {
+                    elevatorTarget -= 415;
+                    coolDownReset();
+                }
+                else if(betterGamepad2.dpadRightOnce())
+                {
+                    elevatorTarget += 415;
+                    coolDownReset();
+                }
+
+                if(betterGamepad2.touchpadOnce())
+                {
+                    switchOuttake();
+                }
+
+                if(betterGamepad1.YOnce() || betterGamepad1.AOnce())
+                {
+                    claw.setBothClaw(Claw.ClawState.OPEN);
+
+                    ACount++;
+
+                }
+
+                if ((ACount > 1 && cooldowned()) || (betterGamepad2.shareOnce() && cooldowned()))  {
+                    claw.setBothClaw(Claw.ClawState.OPEN);
+
+                    openedXTimes++;
+
+
+                    elevatorReset = getTime();
+                    retract = true;
+                    ACount = 0;
+                } else if ((getTime() - elevatorReset) >= WAIT_DELAY_TILL_CLOSE && retract)
+                {
+                    retract = false;
+                    firstOuttakeAngle = true;
+                    outtake.resetOuttake();
+                    outtake.setAngle(Outtake.Angle.INTAKE);
+                    liftState = LiftState.RETRACT;
+                }
+
             case HANG:
                 elevatorTarget = elevator.HANG;
 
@@ -310,7 +552,7 @@ public class OpMode extends LinearOpMode {
             case STUCK_2:
                 outtake.setAngle(Outtake.Angle.OUTTAKE);
 
-                elevatorTarget = elevator.MAX_LEVEL;
+                elevator.setTarget(elevator.HIGH_BASKET_LEVEL);
 
                 if(betterGamepad2.XOnce())
                 {

@@ -18,7 +18,11 @@ public class Elevator implements Subsystem
     private final RobotHardware robot = RobotHardware.getInstance();
     public static double ELEVATOR_INCREMENT = 70;
     public static double BASE_LEVEL = 200;
-    public static double MAX_LEVEL = 500;
+    public static double HIGH_BASKET_LEVEL = 2800 , LOW_BASKET_LEVEL = 1400 , MAX_HEIGHT = 5000;
+
+    public static double HIGH_EXTRACT_LEVEL  = 1200 , LOW_EXTRACT_LEVEL = 600;
+    public static double CONFIRM_EXTRACT = 700;
+
     public static double HANG_OPEN = 400;
     public static double HANG = 400;
     double currentTarget = 0;
@@ -37,6 +41,7 @@ public class Elevator implements Subsystem
     {
         this.isAuto = isAuto;
         this.elevatorMotor = robot.hardwareMap.get(DcMotorEx.class, "mE");
+        this.elevatorMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
         if(firstPID && !isAuto)
@@ -78,7 +83,8 @@ public class Elevator implements Subsystem
     {
         this.isAuto = isAuto;
 
-        this.elevatorMotor = robot.hardwareMap.get(DcMotorEx.class, "mER");
+        this.elevatorMotor = robot.hardwareMap.get(DcMotorEx.class, "mE");
+
         if (isAuto)
         {
             elevatorMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -152,9 +158,9 @@ public class Elevator implements Subsystem
 
     public void setTarget(double target)
     {
-        if(target > MAX_LEVEL)
+        if(target > MAX_HEIGHT)
         {
-            this.currentTarget = MAX_LEVEL;
+            this.currentTarget = MAX_HEIGHT;
         }
         else
         {
