@@ -19,7 +19,7 @@ public class OuttakeExtension implements Subsystem {
     private final RobotHardware robot;
     double currentTarget = 0;
     public static double limitMultiplier = 1;
-    public static double fullLength = 0, halfLength = 0, closed = 0;
+    public static double fullLength = 0.7, halfLength = 0, closed = 0;
 
     Gamepad gamepad;
     BetterGamepad cGamepad;
