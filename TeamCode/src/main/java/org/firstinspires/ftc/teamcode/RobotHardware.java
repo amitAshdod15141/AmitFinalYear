@@ -46,9 +46,10 @@ public class RobotHardware {
 
     public BetterServo outtakeClawServo;
 
+    public Servo sER;
+    public Servo sEL;
 
     public MecanumDrive drive;
-
 
     // Telemetry storage
     public Telemetry telemetry;
@@ -127,8 +128,6 @@ public class RobotHardware {
         this.dtFrontRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
-
-
         // OUTTAKE
 
         this.outtakeClawServo = new BetterServo(hardwareMap.get(Servo.class, "sC"));
@@ -139,10 +138,12 @@ public class RobotHardware {
         this.outtakeHandServo.setDirection(Servo.Direction.REVERSE);
 
 
+        //OUTTAKE EXTENSION
+        this.sER = hardwareMap.get(Servo.class, "sER");
+        this.sEL = hardwareMap.get(Servo.class, "sEL");
+        this.sEL.setDirection(Servo.Direction.REVERSE);
+
         voltage = hardwareMap.voltageSensor.iterator().next().getVoltage();
-
-
-
 
     }
 

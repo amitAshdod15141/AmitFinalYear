@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Claw;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Elevator;
 import org.firstinspires.ftc.teamcode.subsystems.Outtake;
+import org.firstinspires.ftc.teamcode.subsystems.OuttakeExtension;
 import org.firstinspires.ftc.teamcode.util.BetterGamepad;
 import org.firstinspires.ftc.teamcode.util.ClawSide;
 
@@ -29,6 +30,7 @@ public class DebugOpMode extends LinearOpMode {
     Elevator elevator;
 
     Outtake outtake;
+    OuttakeExtension outtakeExtension;
     Claw claw;
 
     ElapsedTime codeTime;
@@ -91,12 +93,14 @@ public class DebugOpMode extends LinearOpMode {
         drivetrain = new Drivetrain(gamepad1, true, true);
         elevator = new Elevator(gamepad2, true, false);
         outtake = new Outtake();
+        outtakeExtension = new OuttakeExtension(gamepad2);
         claw = new Claw();
 
         codeTime = new ElapsedTime();
 
         claw.setBothClaw(Claw.ClawState.INTAKE);
         outtake.setAngle(Outtake.Angle.INTAKE);
+        outtakeExtension.setExtensionAngle(OuttakeExtension.ExtensionPos.CLOSED);
         elevator.setAuto(false);
 
         claw.update();
@@ -117,6 +121,7 @@ public class DebugOpMode extends LinearOpMode {
             telemetry.update();
             claw.update();
             outtake.update();
+            outtakeExtension.update();
 
         }
 
@@ -131,6 +136,7 @@ public class DebugOpMode extends LinearOpMode {
             betterGamepad2.update();
             drivetrain.update();
             outtake.update();
+            outtakeExtension.update();
             elevator.update();
             claw.update();
 
@@ -169,6 +175,14 @@ public class DebugOpMode extends LinearOpMode {
     {
         switch (liftState) {
             case RETRACT:
+
+
+                if (betterGamepad1.rightBumperOnce())
+                {
+                    outtakeExtension.setExtensionAngle(OuttakeExtension.ExtensionPos.FULL_LENGTH);
+                    outtake.setAngle(Outtake.Angle.INTAKE);
+
+                }
                 firstOuttake = true;
                 elevator.setTarget(0);
 
@@ -205,12 +219,14 @@ public class DebugOpMode extends LinearOpMode {
                     liftState  = LiftState.EXTRACT_CONFIRM;
                 }
 
-                elevator.setTarget(elevator.CONFIRM_EXTRACT);
+                elevator.setTarget(elevator.HIGH_EXTRACT_LEVEL);
 
                 if(gamepad2.right_stick_y != 0)
                 {
                     elevatorTarget = elevator.getPos() - (openedXTimes * (Elevator.ELEVATOR_INCREMENT));
                 }
+
+
 
                 if ((getTime() - previousElevator) >= WAIT_DELAY_TILL_OUTTAKE) {
                     outtake.setAngle(Outtake.Angle.OUTTAKE);

@@ -9,9 +9,9 @@ public class Outtake implements Subsystem {
 
     private final RobotHardware robot;
 
-    public static double almostIntakeHandPivot = 0.35, intakeHandPivot = 0.22;
-    public static double outtakeHandPivot = 0.7;
-    public static double floorHandPivot = 0.85, goBackRelease = 0.05;
+    public static double almostIntakeHandPivot = 0.35, intakeHandPivot = 0.5;
+    public static double outtakeHandPivot = 0.75;
+    public static double floorHandPivot = 0, goBackRelease = 0.05;
 
     public static double releaseSampleHand = 0.65 ;
     public static double defaultOuttakeHandPivot = 0.7;

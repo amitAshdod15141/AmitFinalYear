@@ -14,9 +14,9 @@ public class ServoTest extends LinearOpMode {
     private Servo servo1 = null;
     private Servo servo2 = null;
     private Servo servo3 = null;
-    public static String hw = "sCR";
-    public static String hw2 = "sCL";
-    public static String hw3 = "sC";
+    public static String hw = "sEL";
+    public static String hw2 = "sH";
+    public static String hw3 = "sER";
 
     public static double pos1 = 0.35;
     public static double pos2 = 0.35;
