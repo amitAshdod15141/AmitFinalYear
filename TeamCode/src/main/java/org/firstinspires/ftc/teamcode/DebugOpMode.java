@@ -178,14 +178,14 @@ public class DebugOpMode extends LinearOpMode {
                 {
                     previousElevator = getTime();
                     claw.setBothClaw(Claw.ClawState.CLOSED);
-                    liftState = LiftState.EXTRACT_HIGH;
+                    liftState = LiftState.EXTRACT_HIGH_BASKET;
                 }
 
-                if(betterGamepad1.XOnce())
+                if(betterGamepad1.BOnce())
                 {
                     previousElevator = getTime();
                     claw.setBothClaw(Claw.ClawState.CLOSED);
-                    liftState = LiftState.EXTRACT_HIGH_BASKET;
+                    liftState = LiftState.EXTRACT_HIGH;
                 }
 
                 else if(betterGamepad2.dpadUpOnce())
@@ -199,7 +199,7 @@ public class DebugOpMode extends LinearOpMode {
                 break;
             case EXTRACT_HIGH:
 
-                if(betterGamepad1.YOnce())
+                if(betterGamepad1.BOnce())
                 {
 
                     liftState  = LiftState.EXTRACT_CONFIRM;
@@ -303,7 +303,7 @@ public class DebugOpMode extends LinearOpMode {
 
             case EXTRACT_HIGH_BASKET:
 
-                if (betterGamepad1.XOnce())
+                if (betterGamepad1.YOnce())
                 {
                     liftState = LiftState.EXTRACT_LOW_BAKSET;
 
