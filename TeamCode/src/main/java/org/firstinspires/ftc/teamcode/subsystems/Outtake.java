@@ -1,27 +1,28 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.RobotHardware;
+import org.firstinspires.ftc.teamcode.util.ClawSide;
+import org.firstinspires.ftc.teamcode.util.wrappers.BetterSubsystem;
 import org.jetbrains.annotations.NotNull;
+
 @Config
 public class Outtake implements Subsystem {
 
     private final RobotHardware robot;
 
-    public static double almostIntakeHandPivot = 0.35, intakeHandPivot = 0.5;
-    public static double outtakeHandPivot = 0.75;
-    public static double floorHandPivot = 0, goBackRelease = 0.05;
+    public static double  intakeHandLeftPivot = 0.3, intakeHandRightPivot = 0.96,  intakeClawPivot = 0.25;
+    public static double outtakeHandRightPivot = 1, outtakeHandLeftPivot = 0;
+    public static double goBackRelease = 0.05;
 
-    public static double releaseSampleHand = 0.65 ;
-    public static double defaultOuttakeHandPivot = 0.7;
-    public static double hangHand = 0.6;
+    public static double releaseStackHand = 0.65 , releaseStackClaw = .4;
+
+    public static double hangHand = 0.6, handClaw = .4;
 
     public static double power = 1;
 
-    public static void setOuttakeHandPivot(double outtakeHandPivot) {
-        Outtake.outtakeHandPivot = outtakeHandPivot;
-    }
 
     @Override
     public void play() {
@@ -40,11 +41,8 @@ public class Outtake implements Subsystem {
 
     public enum Angle {
         INTAKE,
-        ALMOST_INTAKE,
         OUTTAKE,
-        FLOOR,
         HANG,
-        RELEASE_SAMPLE
 
     }
 
@@ -52,7 +50,7 @@ public class Outtake implements Subsystem {
         HAND
     }
 
-    Angle angle = Angle.INTAKE;
+    Angle angle = Angle.OUTTAKE;
 
     public Outtake() {
         this.robot = RobotHardware.getInstance();
@@ -61,7 +59,6 @@ public class Outtake implements Subsystem {
 
     public void update() {
         updateState(Type.HAND);
-
     }
 
     public void setAngle(@NotNull Angle angle) {
@@ -77,25 +74,18 @@ public class Outtake implements Subsystem {
 
             case HAND:
                 switch (angle) {
-                    case ALMOST_INTAKE:
-                        this.robot.outtakeHandServo.setPosition(almostIntakeHandPivot);
-
-                        break;
                     case INTAKE:
-                        this.robot.outtakeHandServo.setPosition(intakeHandPivot);
-
+                        this.robot.outtakeHandRightServo.setPosition(intakeHandRightPivot);
+                        this.robot.outtakeHandLeftServo.setPosition(intakeHandLeftPivot);
                         break;
                     case OUTTAKE:
-                        this.robot.outtakeHandServo.setPosition(outtakeHandPivot);
-                        break;
-                    case FLOOR:
-                        this.robot.outtakeHandServo.setPosition(floorHandPivot);
+                        this.robot.outtakeHandRightServo.setPosition(outtakeHandRightPivot);
+                        this.robot.outtakeHandLeftServo.setPosition(outtakeHandLeftPivot);
                         break;
                     case HANG:
-                        this.robot.outtakeHandServo.setPosition(hangHand);
-                        break;
-                    case RELEASE_SAMPLE:
-                        this.robot.outtakeHandServo.setPosition(releaseSampleHand);
+                        this.robot.outtakeHandRightServo.setPosition(hangHand);
+                        this.robot.outtakeHandLeftServo.setPosition(hangHand);
+
                         break;
                 }
                 break;
@@ -103,14 +93,5 @@ public class Outtake implements Subsystem {
     }
 
 
-    public void releasePixel()
-    {
-        outtakeHandPivot -= goBackRelease;
-    }
-    public void resetOuttake()
-    {
-
-        outtakeHandPivot = defaultOuttakeHandPivot;
-    }
 
 }

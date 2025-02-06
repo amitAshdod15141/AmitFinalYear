@@ -37,12 +37,14 @@ public class RobotHardware {
     public DcMotorEx dtBackRightMotor;
     // elevator
 
+    public Servo outtakeHandRightServo;
+    public Servo outtakeHandLeftServo;
     public RevColorSensorV3 colorRight;
     public RevColorSensorV3 colorLeft;
 
     // outake
 
-    public BetterServo outtakeHandServo;
+
 
     public BetterServo outtakeClawServo;
 
@@ -133,9 +135,10 @@ public class RobotHardware {
         this.outtakeClawServo = new BetterServo(hardwareMap.get(Servo.class, "sC"));
         this.outtakeClawServo.setDirection(Servo.Direction.REVERSE);
 
-        // HAND
-        this.outtakeHandServo = new BetterServo(hardwareMap.get(Servo.class, "sH"));
-        this.outtakeHandServo.setDirection(Servo.Direction.REVERSE);
+
+
+        this.outtakeHandRightServo= hardwareMap.get(Servo.class, "sHR");
+        this.outtakeHandLeftServo = hardwareMap.get(Servo.class, "sHL");
 
 
         //OUTTAKE EXTENSION

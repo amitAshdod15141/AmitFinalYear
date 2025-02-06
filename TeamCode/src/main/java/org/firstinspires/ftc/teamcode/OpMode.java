@@ -17,6 +17,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Claw;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Elevator;
 import org.firstinspires.ftc.teamcode.subsystems.Outtake;
+import org.firstinspires.ftc.teamcode.subsystems.OuttakeExtension;
 import org.firstinspires.ftc.teamcode.util.BetterGamepad;
 
 @Config
@@ -31,6 +32,7 @@ public class OpMode extends LinearOpMode {
     Elevator elevator;
 
     Outtake outtake;
+    OuttakeExtension outtakeExtension;
     Claw claw;
 
     ElapsedTime codeTime;
@@ -54,10 +56,6 @@ public class OpMode extends LinearOpMode {
     boolean rightClaw = true, leftClaw = true;
 
 
-    public enum OuttakeState {
-        OUTTAKE,
-        OUTTAKE_LONG
-    }
 
     public enum LiftState {
         RETRACT,
@@ -69,8 +67,17 @@ public class OpMode extends LinearOpMode {
         HANG
     }
 
+    public enum OuttakeExtensionState {
+
+       READY,
+        UNAVILABLE,
+
+    }
+
     LiftState liftState = LiftState.RETRACT;
-    OuttakeState outtakeState = OuttakeState.OUTTAKE;
+    OuttakeExtensionState outtakeExtensionState = OuttakeExtensionState.UNAVILABLE;
+
+
 
     @Override
     public void runOpMode() {
@@ -89,8 +96,9 @@ public class OpMode extends LinearOpMode {
         drivetrain = new Drivetrain(gamepad1, true, false);
         elevator = new Elevator(gamepad2, false, false);
         outtake = new Outtake();
+        outtakeExtension = new OuttakeExtension(gamepad2);
         claw = new Claw();
-        claw.setBothClaw(Claw.ClawState.INTAKE);
+        claw.setClaw(Claw.ClawState.OPEN);
         outtake.setAngle(Outtake.Angle.INTAKE);
         elevator.setAuto(false);
 
@@ -124,6 +132,7 @@ public class OpMode extends LinearOpMode {
             telemetry.update();
             claw.update();
             outtake.update();
+            outtakeExtension.update();
 
         }
 
@@ -132,8 +141,7 @@ public class OpMode extends LinearOpMode {
         codeTime.reset();
 
 
-        while (opModeIsActive())
-        {
+        while (opModeIsActive()) {
 
             betterGamepad1.update();
             betterGamepad2.update();
@@ -142,15 +150,12 @@ public class OpMode extends LinearOpMode {
             outtake.update();
             elevator.update();
             claw.update();
+            outtakeExtension.update();
 
 
-
-            if(gamepad2.left_trigger != 0 || gamepad1.left_trigger != 0)
-            {
+            if (gamepad2.left_trigger != 0 || gamepad1.left_trigger != 0) {
                 drivetrain.superSlow();
             }
-
-
 
 
             if (gamepad2.right_stick_y != 0) {
@@ -160,49 +165,81 @@ public class OpMode extends LinearOpMode {
             }
 
 
-
-            if(betterGamepad1.shareOnce())
-            {
+            if (betterGamepad1.shareOnce()) {
                 drivetrain.maxPower = 0.9;
             }
 
             elevatorStateMachine();
-
-
-            telemetry.addData("left" , leftClaw);
-            telemetry.addData("right" , rightClaw);
-            telemetry.update();
+            outtakeStateMachine();
         }
+
+
+        telemetry.addData("left" , leftClaw);
+        telemetry.addData("right" , rightClaw);
+        telemetry.update();
     }
 
 
 
 
 
+    void outtakeStateMachine ()
+    {
+
+        switch (outtakeExtensionState)
+        {
+            case UNAVILABLE:
+
+
+            claw.setClaw(Claw.ClawState.OPEN);
+             outtakeExtension.setTarget(OuttakeExtension.Target.CLOSED);
+
+             if(betterGamepad1.rightBumperOnce())
+             {
+                 outtakeExtensionState = OuttakeExtensionState.READY;
+             }
+
+             break;
+
+            case READY:
+
+                outtakeExtension.setTarget(OuttakeExtension.Target.FULL_LENGTH);
+
+                if(betterGamepad1.rightBumperOnce())
+                {
+                    outtakeExtension.setTarget(OuttakeExtension.Target.HALF_LENGTH);
+                }
+
+
+                if (betterGamepad1.leftBumperOnce())
+                {
+                    claw.setClaw(Claw.ClawState.INTAKE);
+                    outtakeExtensionState = OuttakeExtensionState.UNAVILABLE;
+                }
+        }
+    }
+
     void elevatorStateMachine()
     {
         switch (liftState) {
             case RETRACT:
-                firstOuttake = true;
+
+
+                        if (betterGamepad1.AOnce()) {
+                            previousElevator = getTime();
+                            liftState = LiftState.EXTRACT_HIGH_BASKET;
+                        }
+                        if (betterGamepad1.YOnce()) {
+                            previousElevator = getTime();
+                            liftState = LiftState.EXTRACT_HIGH;
+                        }
+
+
                 elevator.setTarget(0);
+                outtakeExtensionState = outtakeExtensionState.UNAVILABLE;
 
-                canIntake = true;
 
-                if (betterGamepad1.YOnce())
-                {
-                    previousElevator = getTime();
-                    claw.setBothClaw(Claw.ClawState.CLOSED);
-                    liftState = LiftState.EXTRACT_HIGH;
-                }
-
-                if(betterGamepad1.XOnce())
-                {
-                    previousElevator = getTime();
-                    claw.setBothClaw(Claw.ClawState.CLOSED);
-                    liftState = LiftState.EXTRACT_HIGH_BASKET;
-                }
-
-                else if(betterGamepad2.dpadUpOnce())
+                if(betterGamepad2.dpadUpOnce())
                 {
                     liftState = LiftState.HANG;
                 }
@@ -213,7 +250,7 @@ public class OpMode extends LinearOpMode {
                 break;
             case EXTRACT_HIGH:
 
-                if (betterGamepad1.YOnce())
+                if (betterGamepad1.XOnce())
                 {
                     liftState = LiftState.EXTRACT_LOW;
                 }
@@ -226,12 +263,19 @@ public class OpMode extends LinearOpMode {
                 }
 
                 if ((getTime() - previousElevator) >= WAIT_DELAY_TILL_OUTTAKE) {
-                    outtake.setAngle(Outtake.Angle.OUTTAKE);
+                    outtake.setAngle(Outtake.Angle.INTAKE);
                 }
+
+
+                if (betterGamepad1.AOnce() || betterGamepad1.leftBumperOnce() || betterGamepad2.shareOnce())
+                {
+                    liftState = LiftState.RETRACT;
+                }
+
 
                 if(betterGamepad1.dpadRightOnce() && cooldowned())
                 {
-                    claw.setRightClaw(Claw.ClawState.OPEN);
+                    claw.setClaw(Claw.ClawState.OPEN);
                 }
 
 
@@ -256,40 +300,15 @@ public class OpMode extends LinearOpMode {
                     coolDownReset();
                 }
 
-                if(betterGamepad2.touchpadOnce())
-                {
-                    switchOuttake();
-                }
 
-                if(betterGamepad1.YOnce() || betterGamepad1.AOnce())
-                {
-                    claw.setBothClaw(Claw.ClawState.OPEN);
-
-                    ACount++;
-
-                }
-
-                if ((ACount > 1 && cooldowned()) || (betterGamepad2.shareOnce() && cooldowned()))  {
-                    claw.setBothClaw(Claw.ClawState.OPEN);
-
-                    openedXTimes++;
-
-
-                    elevatorReset = getTime();
-                    retract = true;
-                    ACount = 0;
-                } else if ((getTime() - elevatorReset) >= WAIT_DELAY_TILL_CLOSE && retract)
-                {
-                    retract = false;
-                    firstOuttakeAngle = true;
-                    outtake.resetOuttake();
-                    outtake.setAngle(Outtake.Angle.INTAKE);
-                    liftState = LiftState.RETRACT;
-                }
                 break;
 
             case EXTRACT_LOW:
 
+                if (betterGamepad1.AOnce() || betterGamepad1.leftBumperOnce() || betterGamepad2.shareOnce())
+                {
+                    liftState = LiftState.RETRACT;
+                }
 
 
                 elevator.setTarget(elevator.LOW_BASKET_LEVEL);
@@ -306,7 +325,7 @@ public class OpMode extends LinearOpMode {
 
                 if(betterGamepad1.dpadRightOnce() && cooldowned())
                 {
-                    claw.setRightClaw(Claw.ClawState.OPEN);
+                    claw.setClaw(Claw.ClawState.OPEN);
                 }
 
 
@@ -331,24 +350,9 @@ public class OpMode extends LinearOpMode {
                     coolDownReset();
                 }
 
-                if(betterGamepad2.touchpadOnce())
-                {
-                    switchOuttake();
-                }
 
-                if(betterGamepad1.YOnce() || betterGamepad1.AOnce())
-                {
-                    claw.setBothClaw(Claw.ClawState.OPEN);
-
-                    ACount++;
-
-                }
 
                 if ((ACount > 1 && cooldowned()) || (betterGamepad2.shareOnce() && cooldowned()))  {
-                    claw.setBothClaw(Claw.ClawState.OPEN);
-
-                    openedXTimes++;
-
 
                     elevatorReset = getTime();
                     retract = true;
@@ -357,7 +361,6 @@ public class OpMode extends LinearOpMode {
                 {
                     retract = false;
                     firstOuttakeAngle = true;
-                    outtake.resetOuttake();
                     outtake.setAngle(Outtake.Angle.INTAKE);
                     liftState = LiftState.RETRACT;
                 }
@@ -379,12 +382,12 @@ public class OpMode extends LinearOpMode {
                 }
 
                 if ((getTime() - previousElevator) >= WAIT_DELAY_TILL_OUTTAKE) {
-                    outtake.setAngle(Outtake.Angle.OUTTAKE);
+                    outtake.setAngle(Outtake.Angle.INTAKE);
                 }
 
                 if(betterGamepad1.dpadRightOnce() && cooldowned())
                 {
-                    claw.setRightClaw(Claw.ClawState.OPEN);
+                    claw.setClaw(Claw.ClawState.OPEN);
                 }
 
 
@@ -409,21 +412,13 @@ public class OpMode extends LinearOpMode {
                     coolDownReset();
                 }
 
-                if(betterGamepad2.touchpadOnce())
+                if (betterGamepad1.AOnce() || betterGamepad1.leftBumperOnce() || betterGamepad2.shareOnce())
                 {
-                    switchOuttake();
-                }
-
-                if(betterGamepad1.YOnce() || betterGamepad1.AOnce())
-                {
-                    claw.setBothClaw(Claw.ClawState.OPEN);
-
-                    ACount++;
-
+                    liftState = LiftState.RETRACT;
                 }
 
                 if ((ACount > 1 && cooldowned()) || (betterGamepad2.shareOnce() && cooldowned()))  {
-                    claw.setBothClaw(Claw.ClawState.OPEN);
+                    claw.setClaw(Claw.ClawState.OPEN);
 
                     openedXTimes++;
 
@@ -435,7 +430,6 @@ public class OpMode extends LinearOpMode {
                 {
                     retract = false;
                     firstOuttakeAngle = true;
-                    outtake.resetOuttake();
                     outtake.setAngle(Outtake.Angle.INTAKE);
                     liftState = LiftState.RETRACT;
                 }
@@ -446,18 +440,23 @@ public class OpMode extends LinearOpMode {
                 elevator.setTarget(elevator.LOW_BASKET_LEVEL);
 
 
+                if (betterGamepad1.AOnce() || betterGamepad1.leftBumperOnce() || betterGamepad2.shareOnce())
+                {
+                    liftState = LiftState.RETRACT;
+                }
+
                 if(gamepad2.right_stick_y != 0)
                 {
                     elevatorTarget = elevator.getPos() - (openedXTimes * (Elevator.ELEVATOR_INCREMENT));
                 }
 
                 if ((getTime() - previousElevator) >= WAIT_DELAY_TILL_OUTTAKE) {
-                    outtake.setAngle(Outtake.Angle.OUTTAKE);
+                    outtake.setAngle(Outtake.Angle.INTAKE);
                 }
 
                 if(betterGamepad1.dpadRightOnce() && cooldowned())
                 {
-                    claw.setRightClaw(Claw.ClawState.OPEN);
+                    claw.setClaw(Claw.ClawState.OPEN);
                 }
 
 
@@ -482,21 +481,16 @@ public class OpMode extends LinearOpMode {
                     coolDownReset();
                 }
 
-                if(betterGamepad2.touchpadOnce())
-                {
-                    switchOuttake();
-                }
-
                 if(betterGamepad1.YOnce() || betterGamepad1.AOnce())
                 {
-                    claw.setBothClaw(Claw.ClawState.OPEN);
+                    claw.setClaw(Claw.ClawState.OPEN);
 
                     ACount++;
 
                 }
 
                 if ((ACount > 1 && cooldowned()) || (betterGamepad2.shareOnce() && cooldowned()))  {
-                    claw.setBothClaw(Claw.ClawState.OPEN);
+                    claw.setClaw(Claw.ClawState.OPEN);
 
                     openedXTimes++;
 
@@ -508,7 +502,6 @@ public class OpMode extends LinearOpMode {
                 {
                     retract = false;
                     firstOuttakeAngle = true;
-                    outtake.resetOuttake();
                     outtake.setAngle(Outtake.Angle.INTAKE);
                     liftState = LiftState.RETRACT;
                 }
@@ -556,7 +549,7 @@ public class OpMode extends LinearOpMode {
 
                 if(betterGamepad2.XOnce())
                 {
-                    claw.setBothClaw(Claw.ClawState.CLOSED);
+                    claw.setClaw(Claw.ClawState.INTAKE);
                     startXDelay = getTime();
                     XPressed = true;
                     liftState = LiftState.RETRACT;
@@ -575,18 +568,7 @@ public class OpMode extends LinearOpMode {
     }
 
 
-    void switchOuttake()
-    {
-        switch (outtakeState)
-        {
-            case OUTTAKE:
-                outtakeState = OuttakeState.OUTTAKE_LONG;
-                break;
-            case OUTTAKE_LONG:
-                outtakeState = OuttakeState.OUTTAKE;
-                break;
-        }
-    }
+
 
     boolean cooldowned()
     {
@@ -596,26 +578,6 @@ public class OpMode extends LinearOpMode {
     void coolDownReset()
     {
         cooldown = getTime();
-    }
-
-    void openCloseClaws()
-    {
-        if(leftClaw)
-        {
-            claw.setRightClaw(Claw.ClawState.INTAKE);
-        }
-        else
-        {
-            claw.setRightClaw(Claw.ClawState.CLOSED);
-        }
-        if(rightClaw)
-        {
-            claw.setLeftClaw(Claw.ClawState.INTAKE);
-        }
-        else
-        {
-            claw.setLeftClaw(Claw.ClawState.CLOSED);
-        }
     }
 
 

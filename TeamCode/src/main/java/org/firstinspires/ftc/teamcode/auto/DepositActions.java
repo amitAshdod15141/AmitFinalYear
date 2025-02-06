@@ -71,7 +71,7 @@ public class DepositActions {
 
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            outtake.setAngle(Outtake.Angle.ALMOST_INTAKE);
+            outtake.setAngle(Outtake.Angle.INTAKE);
 
             return false;
         }
@@ -109,7 +109,7 @@ public class DepositActions {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
 
-            claw.updateState(Claw.ClawState.CLOSED, ClawSide.BOTH);
+            claw.updateState(Claw.ClawState.OPEN);
             moveElevatorByTraj(elevator);
             outtake.setAngle(Outtake.Angle.OUTTAKE);
 
@@ -152,7 +152,7 @@ public class DepositActions {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
 
-            return !activateSystem(placePixelTimer, () -> claw.updateState(Claw.ClawState.OPEN, ClawSide.BOTH), delay);
+            return !activateSystem(placePixelTimer, () -> claw.updateState(Claw.ClawState.OPEN), delay);
 
 
         }
@@ -170,7 +170,7 @@ public class DepositActions {
 
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                return !activateSystem(placePixelTimer, () -> claw.updateState(Claw.ClawState.OPEN, ClawSide.BOTH), delay);
+                return !activateSystem(placePixelTimer, () -> claw.updateState(Claw.ClawState.OPEN), delay);
             }
         }
 
@@ -220,7 +220,7 @@ public class DepositActions {
 
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                claw.updateState(this._clawState, this._clawSide);
+                claw.updateState(this._clawState);
                 return false;
             }
         }

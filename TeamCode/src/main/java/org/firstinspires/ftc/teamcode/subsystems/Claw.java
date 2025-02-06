@@ -17,8 +17,7 @@ public class Claw implements Subsystem {
 
     @Override
     public void loop(boolean allowMotors) {
-        updateState(leftClaw, ClawSide.LEFT);
-        updateState(rightClaw, ClawSide.RIGHT);
+
     }
 
     @Override
@@ -27,97 +26,62 @@ public class Claw implements Subsystem {
     }
 
     public enum ClawState {
-        CLOSED,
         INTAKE,
         OPEN,
 
     }
 
-    public ClawState leftClaw = ClawState.OPEN;
-    public ClawState rightClaw = ClawState.OPEN;
+
+    public ClawState Claw = ClawState.OPEN;
 
     // LOOK FORM INTAKE
-    public static double intakeRight = 0.4, intakeLeft = 0.275;
-    public static double openRight = .275, openLeft = 0.175;
-    public static double closeRight = .225, closeLeft = .1;
+    public static double intake = 0;
+    public static double release =  0.05;
+
+    public static double target = 0;
 
 
     public Claw() {
         this.robot = RobotHardware.getInstance();
-        updateState(ClawState.OPEN, ClawSide.BOTH);
+        updateState(ClawState.OPEN);
     }
 
     public void update() {
-        updateState(leftClaw, ClawSide.LEFT);
-        updateState(rightClaw, ClawSide.RIGHT);
+        updateState(Claw);
     }
 
-    public void updateState(@NotNull ClawState state, @NotNull ClawSide side) {
-        double position = getClawStatePosition(state, side);
+    public void updateState(@NotNull ClawState state) {
 
-        switch (side) {
-            case LEFT:
-                robot.outtakeClawServo.setPosition(position);
-                this.leftClaw = state;
+        switch (state) {
+
+            case INTAKE:
+
+                target = intake;
+
                 break;
-            case RIGHT:
-                robot.outtakeClawServo.setPosition(position);
-                this.rightClaw = state;
+
+            case OPEN:
+
+                target = release;
+
                 break;
-            case BOTH:
-                position = getClawStatePosition(state, ClawSide.LEFT);
-                robot.outtakeClawServo.setPosition(position);
-                this.leftClaw = state;
-                position = getClawStatePosition(state, ClawSide.RIGHT);
-                robot.outtakeClawServo.setPosition(position);
-                this.rightClaw = state;
-                break;
-        }
 
-
-    }
-
-    private double getClawStatePosition(ClawState state, ClawSide side) {
-        switch (side) {
-            case LEFT:
-                switch (state) {
-                    case CLOSED:
-                        return closeLeft;
-                    case INTAKE:
-                        return intakeLeft;
-                    case OPEN:
-                        return openLeft;
-                    default:
-                        return 0.0;
-                }
-            case RIGHT:
-                switch (state) {
-                    case CLOSED:
-                        return closeRight;
-                    case INTAKE:
-                        return intakeRight;
-                    case OPEN:
-                        return openRight;
-                    default:
-                        return 0.0;
-                }
             default:
-                return 0.0;
+
+            state = ClawState.INTAKE;
         }
+
+
+        robot.outtakeClawServo.setPosition(target);
     }
 
 
-    public void setLeftClaw(ClawState leftClaw) {
-        this.leftClaw = leftClaw;
-    }
 
-    public void setRightClaw(ClawState rightClaw) {
-        this.rightClaw = rightClaw;
-    }
 
-    public void setBothClaw(ClawState state) {
-        this.rightClaw = state;
-        this.leftClaw = state;
+
+    public void setClaw(ClawState state) {
+        this.Claw = state;
+
         update();
     }
 }

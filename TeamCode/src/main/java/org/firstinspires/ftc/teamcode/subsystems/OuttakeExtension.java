@@ -1,134 +1,102 @@
 package org.firstinspires.ftc.teamcode.subsystems;
+
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.RobotHardware;
 import org.firstinspires.ftc.teamcode.util.BetterGamepad;
-import org.firstinspires.ftc.teamcode.util.PIDFController;
 import org.jetbrains.annotations.NotNull;
 
 @Config
-public class OuttakeExtension implements Subsystem {
+public class OuttakeExtension implements Subsystem{
 
-    private final RobotHardware robot;
-    double currentTarget = 0;
-    public static double limitMultiplier = 1;
-    public static double fullLength = 0.7, halfLength = 0, closed = 0;
+    RobotHardware robot;
 
-    Gamepad gamepad;
-    BetterGamepad cGamepad;
+    Servo sEL;
+    Servo sER;
 
+    public static double maxPower = 0.75;
 
 
-    public enum ExtensionPos {
+    double currentTargetRight = 0 ,currentTargetLeft = 0;
+    public static double limitMultiplier = 0.6;
+    public static double fullLengthLeft = 0.03, fullLengthRight = 0.63 ,
+            halfLength = 0,
+            closedRight = 1, closedLeft = 0.005;
+
+    public enum Target {
+
         FULL_LENGTH,
         HALF_LENGTH,
         CLOSED
 
     }
+    Gamepad gamepad;
+    BetterGamepad cGamepad;
 
+    Target target = Target.CLOSED;
 
-    public enum TypeExetension
+    public OuttakeExtension (Gamepad gamepad)
     {
-
-        USE_PREMADE
-    }
-
-    ExtensionPos extensionPos = ExtensionPos.CLOSED;
-
-    public OuttakeExtension(Gamepad gamepad) {
         this.robot = RobotHardware.getInstance();
         this.gamepad = gamepad;
         this.cGamepad = new BetterGamepad(gamepad);
+        this.sEL = robot.hardwareMap.get(Servo.class, "sEL");
+        this.sEL.setDirection(Servo.Direction.REVERSE);
+        this.sER = robot.hardwareMap.get(Servo.class, "sER");
+
     }
 
-
-    public void updateState(@NotNull TypeExetension exetension) {
-
-        if (gamepad.left_stick_x != 0) {
-            robot.sEL.setPosition(currentTarget + (gamepad.left_stick_x * limitMultiplier));
-            robot.sER.setPosition(currentTarget + (gamepad.left_stick_x * limitMultiplier));
-        } else {
-            robot.sEL.setPosition(0);
-            robot.sER.setPosition(0);
-        }
-
-
-        switch (exetension)
+    public void update ()
+    {
+        switch(target)
         {
-            case USE_PREMADE:
+            case CLOSED:
 
-            switch (extensionPos)
-            {
-                case FULL_LENGTH:
+                currentTargetRight = closedRight;
+                currentTargetLeft = closedLeft;
+                break;
 
-                    currentTarget = fullLength;
+            case HALF_LENGTH:
 
-                    break;
+                currentTargetRight = halfLength;
+                currentTargetLeft = halfLength;
 
-                case CLOSED:
+                break;
 
-                    currentTarget = closed;
-                    break;
+            case FULL_LENGTH:
 
-                case HALF_LENGTH:
+                currentTargetRight = fullLengthRight;
+                currentTargetLeft = fullLengthLeft;
 
-                    currentTarget = halfLength;
+                break;
 
-                    break;
+            default:
 
-                default:
-
-                    currentTarget = closed;
-
-            }
-
-            break;
-
-            default: exetension = TypeExetension.USE_PREMADE;
-
+                currentTargetRight = closedRight;
+                currentTargetLeft = closedLeft;
         }
 
 
 
-        robot.sEL.setPosition(currentTarget);
-        robot.sER.setPosition(currentTarget);
-    }
+        sEL.setPosition(currentTargetLeft);
+        sER.setPosition(currentTargetRight);
 
-
-    public void update() {
-        updateState(TypeExetension.USE_PREMADE);
 
     }
 
 
+    public void setTarget (@NotNull Target chooseTarget)
+    {
+        this.target = chooseTarget;
 
-    public void setExtensionAngle(@NotNull ExtensionPos extensionAngle) {
-        this.extensionPos = extensionAngle;
-
-        updateState(TypeExetension.USE_PREMADE);
-    }
-    public void setTarget(double target) {
+        update();
 
     }
-
-
-
-    public double getPosRight() {
-        return robot.sER.getPosition();
-    }
-
-    public double getPosLeft() {
-        return robot.sEL.getPosition();
-    }
-
-
     @Override
     public void play() {
 
