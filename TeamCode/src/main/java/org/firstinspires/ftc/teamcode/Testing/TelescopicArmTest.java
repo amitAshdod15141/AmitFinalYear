@@ -26,7 +26,7 @@ public class TelescopicArmTest extends LinearOpMode {
 
         robot.init(hardwareMap, telemetry);
 
-        telescopicHand = new TelescopicHand(gamepad1, true, true);
+        telescopicHand = new TelescopicHand(gamepad1, true, false);
         telescopicHand.setAuto(false);
 
 
@@ -48,6 +48,11 @@ public class TelescopicArmTest extends LinearOpMode {
 
             }
             telescopicHand.setTarget(target);
+
+
+            telemetry.addData("right pos" , telescopicHand.telescopicMotorRight.getCurrentPosition());
+            telemetry.addData("left pos" , telescopicHand.telescopicMotorLeft.getCurrentPosition());
+            telemetry.update();
 
             telescopicHand.update();
 

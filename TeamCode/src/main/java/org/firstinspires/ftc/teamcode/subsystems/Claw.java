@@ -35,10 +35,10 @@ public class Claw implements Subsystem {
     public ClawState Claw = ClawState.OPEN;
 
     // LOOK FORM INTAKE
-    public static double intake = 0;
-    public static double release =  0.05;
+    public static double intakeRight = 0.03 , intakeLeft = 0.97;
+    public static double releaseRight =  0.3 , releaseLeft = 0.7 ;
 
-    public static double target = 0;
+    public static double targetRight = 0 , targetLeft = 0;
 
 
     public Claw() {
@@ -56,13 +56,15 @@ public class Claw implements Subsystem {
 
             case INTAKE:
 
-                target = intake;
+                targetRight = intakeRight;
+                targetLeft = intakeLeft;
 
                 break;
 
             case OPEN:
 
-                target = release;
+                targetRight = releaseRight;
+                targetLeft = releaseLeft;
 
                 break;
 
@@ -72,8 +74,8 @@ public class Claw implements Subsystem {
         }
 
 
-        robot.clawRightServo.setPosition(target);
-        robot.clawLeftServo.setPosition(target);
+        robot.clawRightServo.setPosition(targetRight);
+        robot.clawLeftServo.setPosition(targetLeft);
     }
 
 

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -9,10 +10,12 @@ import org.firstinspires.ftc.teamcode.RobotHardware;
 import org.firstinspires.ftc.teamcode.util.BetterGamepad;
 import org.firstinspires.ftc.teamcode.util.PIDFController;
 
+@Config
 public class TelescopicHand implements Subsystem
 {
     private final RobotHardware robot = RobotHardware.getInstance();
-    public static double ticksPerRevolution = 1993.6;
+    public static double ticksPerRevolution = 1993.6 * 3;
+
     public DcMotorEx telescopicMotorRight;
     public DcMotorEx telescopicMotorLeft;
     double currentTarget = 0;
@@ -20,6 +23,9 @@ public class TelescopicHand implements Subsystem
     public static double maxPower = 0.75;
     public static double kPR = 0.0075, kIR = 0, kDR = 0.01;
     public static double kPL = 0.005, kIL = 0, kDL = 0.01;
+
+    public static double OUTTAKE_TELESCOPE = 97 , RETARCT_TELESCOPE = 24 , INTAKE_LONG = 10.5 , INTAKE_SHORT = 8;
+
 
 
     double currentTargetRight = 0, currentTargetLeft = 0;
@@ -38,7 +44,7 @@ public class TelescopicHand implements Subsystem
             this.isAuto = isAuto;
             this.telescopicMotorRight = robot.hardwareMap.get(DcMotorEx.class, "mTR");
             this.telescopicMotorLeft = robot.hardwareMap.get(DcMotorEx.class, "mTL");
-            telescopicMotorLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+            telescopicMotorRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
             if(firstPID && !isAuto)
             {
@@ -109,7 +115,7 @@ public class TelescopicHand implements Subsystem
 
         this.telescopicMotorRight = robot.hardwareMap.get(DcMotorEx.class, "mER");
         this.telescopicMotorLeft = robot.hardwareMap.get(DcMotorEx.class, "mEL");
-        telescopicMotorLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        telescopicMotorRight.setDirection(DcMotorSimple.Direction.REVERSE);
         if (isAuto)
         {
             telescopicMotorRight.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -175,15 +181,15 @@ public class TelescopicHand implements Subsystem
 
     public void setTarget(double angle)
     {
-        if(angle >  90)
+        if(angle > OUTTAKE_TELESCOPE)
         {
-            this.currentTargetRight = 90;
-            this.currentTargetLeft = 90;
+            this.currentTargetRight = OUTTAKE_TELESCOPE;
+            this.currentTargetLeft = OUTTAKE_TELESCOPE  ;
         }
         else
         {
             this.currentTargetRight = angleToTicks(angle);
-            this.currentTargetRight = angleToTicks(angle);
+            this.currentTargetLeft = angleToTicks(angle);
         }
     }
 
