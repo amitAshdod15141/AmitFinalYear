@@ -13,8 +13,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.subsystems.Claw;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Elevator;
-import org.firstinspires.ftc.teamcode.subsystems.Outtake;
-import org.firstinspires.ftc.teamcode.subsystems.OuttakeExtension;
+import org.firstinspires.ftc.teamcode.subsystems.ReleaseSystem;
+import org.firstinspires.ftc.teamcode.subsystems.TelescopicHand;
 import org.firstinspires.ftc.teamcode.util.BetterGamepad;
 import org.firstinspires.ftc.teamcode.util.ClawSide;
 
@@ -29,13 +29,13 @@ public class DebugOpMode extends LinearOpMode {
     Drivetrain drivetrain;
     Elevator elevator;
 
-    Outtake outtake;
-    OuttakeExtension outtakeExtension;
+    ReleaseSystem releaseSystem;
     Claw claw;
+
+    TelescopicHand telescopicHand;
 
     ElapsedTime codeTime;
     Gamepad.RumbleEffect customRumbleEffect;    // Use to build a custom rumble sequence.
-
 
     // gamepads
     GamepadEx gamepadEx, gamepadEx2;
@@ -94,19 +94,20 @@ public class DebugOpMode extends LinearOpMode {
 
         drivetrain = new Drivetrain(gamepad1, true, true);
         elevator = new Elevator(gamepad2, true, false);
-        outtake = new Outtake();
-        outtakeExtension = new OuttakeExtension(gamepad2);
+        releaseSystem = new ReleaseSystem();
+        telescopicHand = new TelescopicHand(gamepad2, true, false);
 
         claw = new Claw();
 
         codeTime = new ElapsedTime();
 
         claw.setClaw(Claw.ClawState.OPEN);
-        outtake.setAngle(Outtake.Angle.OUTTAKE);
+        releaseSystem.setAngle(ReleaseSystem.Angle.OUTTAKE);
         elevator.setAuto(false);
+        telescopicHand.setAuto(false);
 
         claw.update();
-        outtake.update();
+        releaseSystem.update();
 
         customRumbleEffect = new Gamepad.RumbleEffect.Builder()
                 .addStep(0.0, 1.0, 500)  //  Rumble right motor 100% for 500 mSec
@@ -122,8 +123,7 @@ public class DebugOpMode extends LinearOpMode {
             telemetry.addLine("Initialized");
             telemetry.update();
             claw.update();
-            outtake.update();
-            outtakeExtension.update();
+            releaseSystem.update();
 
         }
 
@@ -137,10 +137,9 @@ public class DebugOpMode extends LinearOpMode {
             betterGamepad1.update();
             betterGamepad2.update();
             drivetrain.update();
-            outtake.update();
+            releaseSystem.update();
             elevator.update();
             claw.update();
-            outtakeExtension.update();
 
 
             if(gamepad2.left_trigger != 0 || gamepad1.left_trigger != 0)
@@ -152,9 +151,9 @@ public class DebugOpMode extends LinearOpMode {
 
 
             if (gamepad2.right_stick_y != 0) {
-                elevator.setUsePID(false);
+                telescopicHand.setUsePID(false);
             } else {
-                elevator.setUsePID(true);
+                telescopicHand.setUsePID(true);
             }
 
 
@@ -168,8 +167,6 @@ public class DebugOpMode extends LinearOpMode {
 
             telemetry.addData("left" , leftClaw);
             telemetry.addData("right" , rightClaw);
-            telemetry.addData("servoPosR" , robot.sER.getPosition());
-            telemetry.addData("servoPosL" , robot.sEL.getPosition());
             telemetry.update();
         }
     }
@@ -188,7 +185,7 @@ public class DebugOpMode extends LinearOpMode {
                     if (betterGamepad1.BOnce()) {
                         previousElevator = getTime();
                         claw.setClaw(Claw.ClawState.INTAKE);
-                        outtake.setAngle(Outtake.Angle.OUTTAKE);
+                        releaseSystem.setAngle(ReleaseSystem.Angle.OUTTAKE);
                         liftState = LiftState.EXTRACT_HIGH_BASKET;
                     }
 
@@ -197,14 +194,14 @@ public class DebugOpMode extends LinearOpMode {
 
                         previousElevator = getTime();
                         claw.setClaw(Claw.ClawState.INTAKE);
-                        outtake.setAngle(Outtake.Angle.OUTTAKE);
+                        releaseSystem.setAngle(ReleaseSystem.Angle.OUTTAKE);
                         liftState = LiftState.EXTRACT_HIGH;
                     }
 
 
                 if (betterGamepad1.AOnce()) {
 
-                    outtake.setAngle(Outtake.Angle.INTAKE);
+                    releaseSystem.setAngle(ReleaseSystem.Angle.INTAKE);
                 }
 
 
@@ -264,7 +261,7 @@ public class DebugOpMode extends LinearOpMode {
                 }
 
                 if ((getTime() - previousElevator) >= WAIT_DELAY_TILL_OUTTAKE) {
-                    outtake.setAngle(Outtake.Angle.OUTTAKE);
+                    releaseSystem.setAngle(ReleaseSystem.Angle.OUTTAKE);
                 }
 
 
@@ -280,7 +277,7 @@ public class DebugOpMode extends LinearOpMode {
                 {
                     retract = false;
                     firstOuttakeAngle = true;
-                    outtake.setAngle(Outtake.Angle.INTAKE);
+                    releaseSystem.setAngle(ReleaseSystem.Angle.INTAKE);
                     liftState = LiftState.RETRACT;
                 }
                 break;
@@ -306,7 +303,7 @@ public class DebugOpMode extends LinearOpMode {
                 }
 
                 if ((getTime() - previousElevator) >= WAIT_DELAY_TILL_OUTTAKE) {
-                    outtake.setAngle(Outtake.Angle.OUTTAKE);
+                    releaseSystem.setAngle(ReleaseSystem.Angle.OUTTAKE);
                 }
 
                 if(betterGamepad1.dpadRightOnce() && cooldowned())
@@ -356,7 +353,7 @@ public class DebugOpMode extends LinearOpMode {
                 {
                     retract = false;
                     firstOuttakeAngle = true;
-                    outtake.setAngle(Outtake.Angle.INTAKE);
+                    releaseSystem.setAngle(ReleaseSystem.Angle.INTAKE);
                     liftState = LiftState.RETRACT;
                 }
                 break;
@@ -395,7 +392,7 @@ public class DebugOpMode extends LinearOpMode {
                 }
 
                 if ((getTime() - previousElevator) >= WAIT_DELAY_TILL_OUTTAKE) {
-                    outtake.setAngle(Outtake.Angle.OUTTAKE);
+                    releaseSystem.setAngle(ReleaseSystem.Angle.OUTTAKE);
                 }
 
                 if(betterGamepad1.dpadRightOnce() && cooldowned())
@@ -442,7 +439,7 @@ public class DebugOpMode extends LinearOpMode {
                 {
                     retract = false;
                     firstOuttakeAngle = true;
-                    outtake.setAngle(Outtake.Angle.INTAKE);
+                    releaseSystem.setAngle(ReleaseSystem.Angle.INTAKE);
                     liftState = LiftState.RETRACT;
                 }
                 break;
@@ -472,7 +469,7 @@ public class DebugOpMode extends LinearOpMode {
                 }
 
                 if ((getTime() - previousElevator) >= WAIT_DELAY_TILL_OUTTAKE) {
-                    outtake.setAngle(Outtake.Angle.INTAKE);
+                    releaseSystem.setAngle(ReleaseSystem.Angle.INTAKE);
                 }
 
                 if(betterGamepad1.dpadRightOnce() && cooldowned())
@@ -528,14 +525,14 @@ public class DebugOpMode extends LinearOpMode {
                 {
                     retract = false;
                     firstOuttakeAngle = true;
-                    outtake.setAngle(Outtake.Angle.INTAKE);
+                    releaseSystem.setAngle(ReleaseSystem.Angle.INTAKE);
                     liftState = LiftState.RETRACT;
                 }
 
             case HANG:
                 elevatorTarget = elevator.HANG;
 
-                outtake.setAngle(Outtake.Angle.HANG);
+                releaseSystem.setAngle(ReleaseSystem.Angle.HANG);
 
                 if(betterGamepad2.rightBumperOnce())
                 {
@@ -568,7 +565,7 @@ public class DebugOpMode extends LinearOpMode {
 
                 break;
             case STUCK_2:
-                outtake.setAngle(Outtake.Angle.OUTTAKE);
+                releaseSystem.setAngle(ReleaseSystem.Angle.OUTTAKE);
 
                 elevator.setTarget(elevator.HIGH_BASKET_LEVEL);
 

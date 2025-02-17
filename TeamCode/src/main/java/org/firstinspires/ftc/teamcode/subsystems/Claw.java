@@ -68,11 +68,12 @@ public class Claw implements Subsystem {
 
             default:
 
-            state = ClawState.INTAKE;
+                state = ClawState.INTAKE;
         }
 
 
-        robot.outtakeClawServo.setPosition(target);
+        robot.clawRightServo.setPosition(target);
+        robot.clawLeftServo.setPosition(target);
     }
 
 

@@ -8,22 +8,20 @@ import com.acmerobotics.roadrunner.Action;
 import org.firstinspires.ftc.teamcode.RobotHardware;
 import org.firstinspires.ftc.teamcode.subsystems.Claw;
 import org.firstinspires.ftc.teamcode.subsystems.Elevator;
-import org.firstinspires.ftc.teamcode.subsystems.Outtake;
 
 public class UpdateActions {
 
 
     private Elevator elevator;
 
-    private Outtake outtake;
+
     private Claw claw;
     RobotHardware robot = RobotHardware.getInstance();
 
     int counter = 0;
-    public UpdateActions(Elevator elevator, Claw claw, Outtake outtake) {
+    public UpdateActions(Elevator elevator, Claw claw) {
         this.elevator = elevator;
         this.claw = claw;
-        this.outtake = outtake;
     }
     public class UpdateSystems implements Action {
 
@@ -34,7 +32,6 @@ public class UpdateActions {
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             elevator.setPidControl();
             claw.update();
-            outtake.update();
             robot.drive.updatePoseEstimate();
 
             return true;

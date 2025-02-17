@@ -35,21 +35,19 @@ public class RobotHardware {
     public DcMotorEx dtFrontRightMotor;
     public DcMotorEx dtBackLeftMotor;
     public DcMotorEx dtBackRightMotor;
-    // elevator
 
-    public Servo outtakeHandRightServo;
-    public Servo outtakeHandLeftServo;
+
+    // Outtake System
+    public Servo clawSpinServo;
+    public Servo clawHandServo;
+
+    public Servo clawLeftServo;
+    public Servo clawRightServo;
     public RevColorSensorV3 colorRight;
     public RevColorSensorV3 colorLeft;
 
-    // outake
 
 
-
-    public BetterServo outtakeClawServo;
-
-    public Servo sER;
-    public Servo sEL;
 
     public MecanumDrive drive;
 
@@ -68,11 +66,6 @@ public class RobotHardware {
     private ArrayList<BetterSubsystem> subsystems;
 
     private double imuAngle, imuOffset = 0;
-
-
-
-
-
 
 
     boolean has2Pixels = false, closeRight = false, closeLeft = false;
@@ -132,19 +125,15 @@ public class RobotHardware {
 
         // OUTTAKE
 
-        this.outtakeClawServo = new BetterServo(hardwareMap.get(Servo.class, "sC"));
-        this.outtakeClawServo.setDirection(Servo.Direction.REVERSE);
+
+
+        this.clawSpinServo = hardwareMap.get(Servo.class, "sCSS");
+        this.clawHandServo = hardwareMap.get(Servo.class, "sHS");
+        this.clawLeftServo= hardwareMap.get(Servo.class, "sCL");
+        this.clawRightServo = hardwareMap.get(Servo.class, "sCR");
 
 
 
-        this.outtakeHandRightServo= hardwareMap.get(Servo.class, "sHR");
-        this.outtakeHandLeftServo = hardwareMap.get(Servo.class, "sHL");
-
-
-        //OUTTAKE EXTENSION
-        this.sER = hardwareMap.get(Servo.class, "sER");
-        this.sEL = hardwareMap.get(Servo.class, "sEL");
-        this.sEL.setDirection(Servo.Direction.REVERSE);
 
         voltage = hardwareMap.voltageSensor.iterator().next().getVoltage();
 

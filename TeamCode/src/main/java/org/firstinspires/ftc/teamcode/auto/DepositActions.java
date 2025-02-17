@@ -9,7 +9,6 @@ import com.acmerobotics.roadrunner.Action;
 
 import org.firstinspires.ftc.teamcode.subsystems.Claw;
 import org.firstinspires.ftc.teamcode.subsystems.Elevator;
-import org.firstinspires.ftc.teamcode.subsystems.Outtake;
 import org.firstinspires.ftc.teamcode.util.ClawSide;
 import org.firstinspires.ftc.teamcode.util.Stopwatch;
 
@@ -44,7 +43,6 @@ public class DepositActions {
 
     private Elevator elevator;
 
-    private Outtake outtake;
     private Claw claw;
 
     private boolean activated;
@@ -53,10 +51,9 @@ public class DepositActions {
     LockSide lockSide;
     TypeClaws typeClaws;
 
-    public DepositActions(Elevator elevator, Claw claw, Outtake outtake){
+    public DepositActions(Elevator elevator, Claw claw){
         this.elevator = elevator;
         this.claw = claw;
-        this.outtake = outtake;
         typeClaws = TypeClaws.LOCKED;
         releaseSide = ReleaseSide.BOTH_OPEN;
         lockSide = LockSide.BOTH_LOCKS;
@@ -64,18 +61,6 @@ public class DepositActions {
     }
 
 
-    public class DropPurplePixel implements Action {
-
-        public DropPurplePixel() {
-        }
-
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            outtake.setAngle(Outtake.Angle.INTAKE);
-
-            return false;
-        }
-    }
 
 
     private void moveElevatorByTraj(int elevatorTarget) {
@@ -84,13 +69,9 @@ public class DepositActions {
     }
 
     //This function will prepare the intake and outtake  for deposit
-    private void resetIntakeOuttake() {
-        outtake.setAngle(Outtake.Angle.OUTTAKE);
-    }
 
 
     public void retractElevator() {
-        outtake.setAngle(Outtake.Angle.INTAKE);
         elevator.setTarget(0);
         elevator.setPidControl();
     }
@@ -111,7 +92,6 @@ public class DepositActions {
 
             claw.updateState(Claw.ClawState.OPEN);
             moveElevatorByTraj(elevator);
-            outtake.setAngle(Outtake.Angle.OUTTAKE);
 
             return false;
         }
@@ -120,15 +100,11 @@ public class DepositActions {
 
     public class MoveOuttake implements Action {
         Stopwatch readyForDepositTimer;
-        Outtake.Angle angle;
 
-        public MoveOuttake(Outtake.Angle angle) {
-            this.angle = angle;
-        }
 
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            outtake.setAngle(angle);
+
             return false;
         }
     }
@@ -246,16 +222,9 @@ public class DepositActions {
             return new PlaceIntermediatePixel(currentCycle, d);
         }
 
-        public Action moveOuttake(Outtake.Angle thisAngle) {
-            return new MoveOuttake(thisAngle);
-        }
 
         public Action moveElevator(int thisTarget) {
             return new MoveElevator(thisTarget);
-        }
-
-        public Action dropPurplePixel() {
-            return new DropPurplePixel();
         }
 
 }
