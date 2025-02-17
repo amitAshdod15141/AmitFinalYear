@@ -80,8 +80,8 @@ public class DebugOpMode extends LinearOpMode {
 
 
 
-    LiftState liftState = LiftState.RETRACT;
-    IntakeState intakeState = IntakeState.INTAKE_SHORT;
+    LiftState liftState;
+    IntakeState intakeState;
 
     @Override
     public void runOpMode() {
@@ -109,7 +109,10 @@ public class DebugOpMode extends LinearOpMode {
         codeTime = new ElapsedTime();
 
         claw.setClaw(Claw.ClawState.OPEN);
-        releaseSystem.setAngle(ReleaseSystem.Angle.OUTTAKE);
+        releaseSystem.setAngle(ReleaseSystem.Angle.INTAKE);
+        intakeState = IntakeState.RETARCTED;
+        liftState = LiftState.RETRACT;
+
         elevator.setAuto(false);
         telescopicHand.setAuto(false);
 
@@ -207,7 +210,7 @@ public class DebugOpMode extends LinearOpMode {
 
                 elevator.setTarget(0);
 
-                if(betterGamepad1.rightBumperOnce() && !isRetarcted) {
+                if(betterGamepad1.rightBumperOnce() && isRetarcted == true) {
 
                     intakeState = IntakeState.INTAKE_SHORT;
 
@@ -217,7 +220,7 @@ public class DebugOpMode extends LinearOpMode {
 
             case INTAKE_SHORT:
 
-                if(betterGamepad1.rightBumperOnce() && !isRetarcted)
+                if(betterGamepad1.rightBumperOnce() && !isRetarcted == true)
                 {
 
                     intakeState = IntakeState.INTAKE_MID;
@@ -255,7 +258,7 @@ public class DebugOpMode extends LinearOpMode {
             case INTAKE_LONG:
 
 
-                if(betterGamepad1.rightBumperOnce() && !isRetarcted)
+                if(betterGamepad1.rightBumperOnce() && isRetarcted == true)
                 {
 
                     intakeState = IntakeState.RETARCTED;
@@ -318,7 +321,6 @@ public class DebugOpMode extends LinearOpMode {
 
 
 
-                firstOuttake = true;
                 elevator.setTarget(0);
 
 
