@@ -18,8 +18,8 @@ import org.firstinspires.ftc.teamcode.subsystems.TelescopicHand;
 import org.firstinspires.ftc.teamcode.util.BetterGamepad;
 
 @Config
-@TeleOp(name = "Testing OpMode Teleop")
-public class testingOpMode extends LinearOpMode {
+@TeleOp(name = "Full OpMode Teleop")
+public class ReadyOpMode extends LinearOpMode {
 
 
     Drivetrain drivetrain;
@@ -37,8 +37,8 @@ public class testingOpMode extends LinearOpMode {
     GamepadEx gamepadEx, gamepadEx2;
     BetterGamepad betterGamepad1, betterGamepad2;
 
-    public static boolean firstIntake = true , canRetract = false;
-    public static double cooldown = 0, COOL_DOWN = 350 , transferDelay = 0 , retractTime = 0;
+    public static boolean firstIntake = true , canRetract = false , stayClosed = false;
+    public static double cooldown = 0, COOL_DOWN = 350 , transferDelay = 0 , retractTime = 0 ,target = 0;
 
 
     public enum LiftState {
@@ -131,81 +131,32 @@ public class testingOpMode extends LinearOpMode {
             telescopicHand.update();
             claw.update();
 
-            if(elevator.getPos() == 0 && betterGamepad1.rightBumperOnce()) {
-
-
-
+            if (gamepad2.right_stick_y != 0) {
+                telescopicHand.setUsePID( false);
+            } else {
+                telescopicHand.setUsePID(true);
             }
-            elevatorStateMachine();
+
+            if (gamepad2.left_stick_y != 0) {
+                telescopicHand.setUsePID( false);
+            } else {
+                telescopicHand.setUsePID(true);
+            }
+
+
+            if(betterGamepad1.shareOnce())
+            {
+                drivetrain.maxPower = 0.9;
+            }
+
+            systemStateMachine();
         }
 
     }
 
-    /*
-    void intakeStateMachine () {
-
-        switch (intakeState) {
-            case RETARCTED:
-
-                elevator.setTarget(0);
-                releaseSystem.setAngle(ReleaseSystem.Angle.INTAKE);
-                claw.updateState(Claw.ClawState.OPEN);
-
-                if (firstIntake) {
-                    telescopicHand.setTarget(TelescopicHand.INTAKE_SHORT);
-                } else {
-                    telescopicHand.setTarget(TelescopicHand.RETARCT_TELESCOPE);
-                    liftState = LiftState.RETRACT;
-                }
 
 
-
-                if (betterGamepad1.rightBumperOnce()) {
-                    intakeState = IntakeState.INTAKE_SHORT;
-                }
-
-                break;
-
-            case INTAKE_SHORT:
-
-
-                if (betterGamepad1.rightBumperOnce()) {
-                    intakeState = IntakeState.INTAKE_LONG;
-                }
-
-                elevator.setTarget(Elevator.INTAKE_SHORT);
-
-                if (betterGamepad1.leftBumperOnce()) {
-                    firstIntake = false;
-                    claw.updateState(Claw.ClawState.INTAKE);
-                    liftState = LiftState.RETRACT;
-                }
-
-                break;
-
-            case INTAKE_LONG:
-
-                if (betterGamepad1.rightBumperOnce()) {
-                    intakeState = IntakeState.RETARCTED;
-                }
-
-                telescopicHand.setTarget(TelescopicHand.INTAKE_LONG);
-                elevator.setTarget(Elevator.INTAKE_LONG);
-
-
-                if (betterGamepad1.leftBumperOnce()) {
-                    firstIntake = false;
-                    claw.updateState(Claw.ClawState.INTAKE);
-                    liftState = LiftState.RETRACT;
-                }
-
-                break;
-        }
-    }
-
-     */
-
-    void elevatorStateMachine ()
+    void systemStateMachine ()
     {
 
         switch (liftState)
@@ -216,9 +167,16 @@ public class testingOpMode extends LinearOpMode {
 
                 telescopicHand.setTarget(TelescopicHand.RETARCT_TELESCOPE);
                 releaseSystem.setAngle(ReleaseSystem.Angle.INTAKE);
-                claw.updateState(Claw.ClawState.OPEN);
                 elevator.setTarget(0);
 
+
+                if (stayClosed == true)
+                {
+                    claw.updateState(Claw.ClawState.INTAKE);
+                } else
+                {
+                    claw.updateState(Claw.ClawState.OPEN);
+                }
 
                 if (firstIntake) {
                     telescopicHand.setTarget(TelescopicHand.INTAKE_SHORT);
@@ -255,14 +213,20 @@ public class testingOpMode extends LinearOpMode {
                     liftState = LiftState.EXTRACT_LOW_BAKSET;
                 }
 
-                elevator.setTarget(Elevator.HIGH_BASKET_LEVEL);
+                target = Elevator.HIGH_BASKET_LEVEL;
+
+                elevator.setTarget(target);
 
                 if(getTime() - transferDelay >= 300)
                 {
                     releaseSystem.setAngle(ReleaseSystem.Angle.OUTTAKE);
                 }
 
-                if(betterGamepad1.leftBumperOnce())
+                if(betterGamepad2.dpadUpOnce()) { target += 200; }
+
+                if(betterGamepad2.dpadDownOnce()) { target -= 200; }
+
+                if(betterGamepad1.AOnce())
                 {
                     claw.updateState(Claw.ClawState.OPEN);
                     retractTime = getTime();
@@ -273,6 +237,7 @@ public class testingOpMode extends LinearOpMode {
                     liftState = LiftState.RETRACT;
                     canRetract = false;
                     telescopicHand.setTarget(TelescopicHand.RETARCT_TELESCOPE);
+                    stayClosed = false;
 
                 }
                 break;
@@ -287,10 +252,16 @@ public class testingOpMode extends LinearOpMode {
                     releaseSystem.setAngle(ReleaseSystem.Angle.OUTTAKE);
                 }
 
-                if(betterGamepad1.leftBumperOnce())
+                if(betterGamepad1.AOnce())
                 {
                     claw.updateState(Claw.ClawState.OPEN);
                     retractTime = getTime();
+                }
+
+                if (betterGamepad2.dpadUpOnce())
+                {
+
+
                 }
 
                 if(getTime() - retractTime >= 300 && canRetract)
@@ -298,6 +269,7 @@ public class testingOpMode extends LinearOpMode {
                     liftState = LiftState.RETRACT;
                     canRetract = false;
                     telescopicHand.setTarget(TelescopicHand.RETARCT_TELESCOPE);
+                    stayClosed = false;
                 }
                 break;
 
@@ -308,14 +280,19 @@ public class testingOpMode extends LinearOpMode {
                     liftState = LiftState.EXTRACT_CONFIRM;
                 }
 
-                elevator.setTarget(Elevator.HIGH_EXTRACT_LEVEL);
+                target = Elevator.HIGH_EXTRACT_LEVEL;
+                elevator.setTarget(target);
+
+                if(betterGamepad2.dpadUpOnce()) { target += 200; }
+
+                if(betterGamepad2.dpadDownOnce()) { target -= 200; }
 
                 if(getTime() - transferDelay >= 300)
                 {
                     releaseSystem.setAngle(ReleaseSystem.Angle.OUTTAKE);
                 }
 
-                if(betterGamepad1.leftBumperOnce())
+                if(betterGamepad1.AOnce())
                 {
                     claw.updateState(Claw.ClawState.OPEN);
                     retractTime = getTime();
@@ -326,6 +303,7 @@ public class testingOpMode extends LinearOpMode {
                     liftState = LiftState.RETRACT;
                     canRetract = false;
                     telescopicHand.setTarget(TelescopicHand.RETARCT_TELESCOPE);
+                    stayClosed = false;
 
                 }
                 break;
@@ -333,13 +311,19 @@ public class testingOpMode extends LinearOpMode {
 
             case EXTRACT_CONFIRM:
 
-                elevator.setTarget(Elevator.HIGH_EXTRACT_LEVEL);
+                target = Elevator.HIGH_EXTRACT_LEVEL;
+                elevator.setTarget(target);
+
+                if(betterGamepad2.dpadUpOnce()) { target += 200; }
+
+                if(betterGamepad2.dpadDownOnce()) { target -= 200; }
 
                 if (betterGamepad1.AOnce())
                 {
                     liftState = LiftState.RETRACT;
                     canRetract = false;
                     telescopicHand.setTarget(TelescopicHand.RETARCT_TELESCOPE);
+                    stayClosed = false;
                 }
 
                 break;
@@ -350,12 +334,18 @@ public class testingOpMode extends LinearOpMode {
                     liftState = liftState.INTAKE_LONG;
                 }
 
-                elevator.setTarget(Elevator.INTAKE_SHORT);
+                target = Elevator.INTAKE_SHORT;
+                elevator.setTarget(target);
+
+                if(betterGamepad2.dpadRightOnce()) { target += 200; }
+
+                if(betterGamepad2.dpadLeftOnce()) { target -= 200; }
 
                 if (betterGamepad1.leftBumperOnce()) {
                     firstIntake = false;
                     claw.updateState(Claw.ClawState.INTAKE);
                     liftState = LiftState.RETRACT;
+                    stayClosed = true;
                 }
 
                 break;
@@ -367,13 +357,19 @@ public class testingOpMode extends LinearOpMode {
                 }
 
                 telescopicHand.setTarget(TelescopicHand.INTAKE_LONG);
-                elevator.setTarget(Elevator.INTAKE_LONG);
+                elevator.setTarget(target);
 
+                target = Elevator.INTAKE_LONG;
+
+                if(betterGamepad2.dpadRightOnce()) { target += 200; }
+
+                if(betterGamepad2.dpadLeftOnce()) { target -= 200; }
 
                 if (betterGamepad1.leftBumperOnce()) {
                     firstIntake = false;
                     claw.updateState(Claw.ClawState.INTAKE);
                     liftState = LiftState.RETRACT;
+                    stayClosed = true;
                 }
 
                 break;
