@@ -20,7 +20,7 @@ public class Elevator implements Subsystem
     public static double BASE_LEVEL = 200;
     public static double HIGH_BASKET_LEVEL = 3700 , LOW_BASKET_LEVEL = 1500 , MAX_HEIGHT = 5000;
 
-    public static double HIGH_EXTRACT_LEVEL  = 1200 , CONFIRM_LEVEL = 600;
+    public static double HIGH_EXTRACT_LEVEL  = 600 , CONFIRM_LEVEL = 1200;
 
     public static double INTAKE_SHORT = 1000 , INTAKE_LONG = 1700;
 

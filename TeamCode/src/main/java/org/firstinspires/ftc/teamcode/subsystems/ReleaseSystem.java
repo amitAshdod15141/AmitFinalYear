@@ -10,10 +10,10 @@ public class ReleaseSystem  implements Subsystem {
 
     private RobotHardware robot;
 
-    public static double outtakeHandPivot = 0.33 ,intakeHandPivot = 1;
+    public static double outtakeHandPivot = 0.33 ,intakeHandPivot = 0.97;
 
-    public static double outtakeSpinRight = 0.87, outtakeSpinMiddle= 0.88, outtakeSpinLeft = 0.1505;
-    public static double hangHand = 0.6;
+    public static double outtakeSpinRight = 0.87, outtakeSpinMiddle= 0.5, outtakeSpinLeft = 0.1505;
+    public static double hangHand = 0.6 , outtakeSpin45 = 0.65 ,outtakeSpin90 = 0.8 , outtakeSpin135 = 0.95 ;
 
     public static double power = 1;
 
@@ -45,7 +45,13 @@ public class ReleaseSystem  implements Subsystem {
         SPIN_RIGHT,
         SPIN_LEFT,
 
-        SPIN_MIDDLE
+        SPIN_MIDDLE,
+
+        SPIN_45,
+        SPIN_90,
+
+        SPIN_135
+
 
     }
 
@@ -89,7 +95,19 @@ public class ReleaseSystem  implements Subsystem {
                     case SPIN_MIDDLE:
                         this.robot.clawSpinServo.setPosition(outtakeSpinMiddle);
                         break;
+                    case SPIN_45:
+                        this.robot.clawSpinServo.setPosition(outtakeSpin45);
+                        break;
+                    case SPIN_90:
+                        this.robot.clawSpinServo.setPosition(outtakeSpin90);
+                        break;
+                    case SPIN_135:
+                        this.robot.clawSpinServo.setPosition(outtakeSpin135);
+                        break;
+                    default:
+                        angle = angle.SPIN_MIDDLE;
                 }
+                break;
             case HAND:
                 switch (angle) {
                     case INTAKE:

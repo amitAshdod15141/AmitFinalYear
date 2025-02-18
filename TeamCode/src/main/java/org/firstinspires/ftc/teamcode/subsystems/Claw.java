@@ -39,7 +39,7 @@ public class Claw implements Subsystem {
     public ClawState rightClaw = ClawState.OPEN;
 
     // LOOK FORM INTAKE
-    public static double intakeRight = 0.03 , intakeLeft = 0.;
+    public static double intakeRight = 0.03 , intakeLeft = 0.97;
     public static double releaseRight =  0.3 , releaseLeft = 0.7 ;
 
 
