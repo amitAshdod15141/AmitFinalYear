@@ -55,7 +55,8 @@ public class DebugOpMode extends LinearOpMode {
     boolean rightClaw = true, leftClaw = true , isRetarcted = false , firstRetract = true , canRetract = false;
 
 
-    public static double delayRetract = 0;
+
+    public static double delayRetract = 0 , rbCount = 0;
 
 
 
@@ -116,8 +117,11 @@ public class DebugOpMode extends LinearOpMode {
         elevator.setAuto(false);
         telescopicHand.setAuto(false);
 
-        claw.update();
+        drivetrain.update();
         releaseSystem.update();
+        elevator.update();
+        telescopicHand.update();
+        claw.update();
 
         customRumbleEffect = new Gamepad.RumbleEffect.Builder()
                 .addStep(0.0, 1.0, 500)  //  Rumble right motor 100% for 500 mSec
@@ -132,7 +136,7 @@ public class DebugOpMode extends LinearOpMode {
         {
             telemetry.addLine("Initialized");
             telemetry.update();
-            claw.update();
+            drivetrain.update();
             releaseSystem.update();
 
         }
@@ -167,7 +171,7 @@ public class DebugOpMode extends LinearOpMode {
                 telescopicHand.setUsePID(true);
             }
 
-            if (gamepad2.right_stick_y != 0) {
+            if (gamepad2.left_stick_y != 0) {
                 telescopicHand.setUsePID( false);
             } else {
                 telescopicHand.setUsePID(true);
@@ -179,7 +183,7 @@ public class DebugOpMode extends LinearOpMode {
                 drivetrain.maxPower = 0.9;
             }
 
-            elevatorStateMachine();
+            //elevatorStateMachine();
             intakeStateMachine();
 
 
@@ -210,9 +214,9 @@ public class DebugOpMode extends LinearOpMode {
 
                 elevator.setTarget(0);
 
-                if(betterGamepad1.rightBumperOnce() && isRetarcted == true) {
+                if(betterGamepad1.rightBumperOnce()) {
 
-                    intakeState = IntakeState.INTAKE_SHORT;
+                   intakeState = IntakeState.INTAKE_SHORT;
 
                 }
 
@@ -220,13 +224,6 @@ public class DebugOpMode extends LinearOpMode {
 
             case INTAKE_SHORT:
 
-                if(betterGamepad1.rightBumperOnce() && !isRetarcted == true)
-                {
-
-                    intakeState = IntakeState.INTAKE_MID;
-
-                }
-
 
                 telescopicHand.setTarget(telescopicHand.INTAKE_SHORT);
                 elevator.setTarget(elevator.INTAKE_SHORT);
@@ -238,6 +235,8 @@ public class DebugOpMode extends LinearOpMode {
                     canRetract = true;
 
                     delayRetract = getTime();
+
+                    rbCount = 0;
 
 
                 }
@@ -255,15 +254,25 @@ public class DebugOpMode extends LinearOpMode {
 
                 break;
 
+                /*
             case INTAKE_LONG:
 
 
-                if(betterGamepad1.rightBumperOnce() && isRetarcted == true)
-                {
 
+
+                if(betterGamepad1.rightBumperOnce() && isRetarcted == true) {
+
+                    rbCount++;
+
+                }
+
+
+                if(rbCount == 3)
+                {
                     intakeState = IntakeState.RETARCTED;
 
                 }
+
 
                 telescopicHand.setTarget(telescopicHand.INTAKE_SHORT);
 
@@ -292,6 +301,8 @@ public class DebugOpMode extends LinearOpMode {
 
                 }
 
+
+                 */
 
         }
     }
@@ -304,11 +315,13 @@ public class DebugOpMode extends LinearOpMode {
 
 
 
+                telescopicHand.setTarget(telescopicHand.RETARCT_TELESCOPE);
                 firstRetract = true;
                 isRetarcted = true;
 
                     if (betterGamepad1.BOnce()) {
                         releaseSystem.setAngle(ReleaseSystem.Angle.OUTTAKE);
+                        telescopicHand.setTarget(telescopicHand.OUTTAKE_TELESCOPE);
                         liftState = LiftState.EXTRACT_HIGH_BASKET;
                     }
 
@@ -316,6 +329,7 @@ public class DebugOpMode extends LinearOpMode {
                     if (betterGamepad1.YOnce()) {
 
                         releaseSystem.setAngle(ReleaseSystem.Angle.OUTTAKE);
+                        telescopicHand.setTarget(telescopicHand.OUTTAKE_TELESCOPE);
                         liftState = LiftState.EXTRACT_HIGH;
                     }
 
