@@ -90,7 +90,7 @@ public class DepositActions {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
 
-            claw.updateState(Claw.ClawState.OPEN);
+            claw.updateState(Claw.ClawState.OPEN ,ClawSide.BOTH);
             moveElevatorByTraj(elevator);
 
             return false;
@@ -128,7 +128,7 @@ public class DepositActions {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
 
-            return !activateSystem(placePixelTimer, () -> claw.updateState(Claw.ClawState.OPEN), delay);
+            return !activateSystem(placePixelTimer, () -> claw.updateState(Claw.ClawState.OPEN ,ClawSide.BOTH), delay);
 
 
         }
@@ -146,7 +146,7 @@ public class DepositActions {
 
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                return !activateSystem(placePixelTimer, () -> claw.updateState(Claw.ClawState.OPEN), delay);
+                return !activateSystem(placePixelTimer, () -> claw.updateState(Claw.ClawState.OPEN ,ClawSide.BOTH), delay);
             }
         }
 
@@ -196,7 +196,7 @@ public class DepositActions {
 
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                claw.updateState(this._clawState);
+                claw.updateState(this._clawState ,ClawSide.BOTH);
                 return false;
             }
         }

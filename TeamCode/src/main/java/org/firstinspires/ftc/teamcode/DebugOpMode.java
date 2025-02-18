@@ -109,7 +109,7 @@ public class DebugOpMode extends LinearOpMode {
 
         codeTime = new ElapsedTime();
 
-        claw.setClaw(Claw.ClawState.OPEN);
+        claw.setBothClaw(Claw.ClawState.OPEN);
         releaseSystem.setAngle(ReleaseSystem.Angle.INTAKE);
         intakeState = IntakeState.RETARCTED;
         liftState = LiftState.RETRACT;
@@ -200,7 +200,7 @@ public class DebugOpMode extends LinearOpMode {
         {
             case RETARCTED:
 
-                claw.updateState(Claw.ClawState.OPEN);
+                claw.updateState(Claw.ClawState.OPEN ,ClawSide.BOTH);
 
                 if(firstRetract)
                 {
@@ -231,7 +231,7 @@ public class DebugOpMode extends LinearOpMode {
                 if(betterGamepad1.leftBumperOnce())
                 {
 
-                    claw.updateState(Claw.ClawState.INTAKE);
+                    claw.updateState(Claw.ClawState.INTAKE ,ClawSide.BOTH);
                     canRetract = true;
 
                     delayRetract = getTime();
@@ -373,7 +373,7 @@ public class DebugOpMode extends LinearOpMode {
 
                 if (betterGamepad1.rightBumperOnce())
                 {
-                    claw.setClaw(Claw.ClawState.OPEN);
+                    claw.setBothClaw(Claw.ClawState.OPEN);
                 }
 
 
@@ -405,7 +405,7 @@ public class DebugOpMode extends LinearOpMode {
 
                 if (betterGamepad1.rightBumperOnce())
                 {
-                    claw.setClaw(Claw.ClawState.OPEN);
+                    claw.setBothClaw(Claw.ClawState.OPEN);
                     elevatorReset = getTime();
 
                     retract = true;
@@ -422,7 +422,7 @@ public class DebugOpMode extends LinearOpMode {
 
                 if(betterGamepad1.dpadRightOnce() && cooldowned())
                 {
-                    claw.setClaw(Claw.ClawState.OPEN);
+                    claw.setBothClaw(Claw.ClawState.OPEN);
                 }
 
 
@@ -469,7 +469,7 @@ public class DebugOpMode extends LinearOpMode {
 
                 if (betterGamepad1.rightBumperOnce())
                 {
-                    claw.setClaw(Claw.ClawState.OPEN);
+                    claw.setBothClaw(Claw.ClawState.OPEN);
                     elevatorReset = getTime();
                 }
 
@@ -491,7 +491,7 @@ public class DebugOpMode extends LinearOpMode {
 
                 if (betterGamepad1.rightBumperOnce())
                 {
-                    claw.setClaw(Claw.ClawState.OPEN);
+                    claw.setBothClaw(Claw.ClawState.OPEN);
                     elevatorReset = getTime();
 
                     retract = true;
@@ -551,7 +551,7 @@ public class DebugOpMode extends LinearOpMode {
                 }
                 if (betterGamepad1.rightBumperOnce())
                 {
-                    claw.setClaw(Claw.ClawState.OPEN);
+                    claw.setBothClaw(Claw.ClawState.OPEN);
                     elevatorReset = getTime();
 
                     retract = true;
