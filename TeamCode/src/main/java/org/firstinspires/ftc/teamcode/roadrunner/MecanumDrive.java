@@ -51,7 +51,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Config
-public final class MecanumDrive {
+public final class  MecanumDrive {
     public static class Params {
         // IMU orientation
         // TODO: fill in these values based on
@@ -111,6 +111,7 @@ public final class MecanumDrive {
 
     public final LazyImu lazyImu;
 
+    public Pose2d pose;
     public final Localizer localizer;
     private final LinkedList<Pose2d> poseHistory = new LinkedList<>();
 

@@ -41,7 +41,7 @@ public class ReadyOpMode extends LinearOpMode {
     public static boolean firstIntake = true , canRetract = false , stayClosed = false , canIntake = true , sampleFell = false;
     public static double cooldown = 0, COOL_DOWN = 350 , transferDelay = 0 , retractTime = 0 ,target = 0 ,  delayBeforeRetract = 0 , outtakeAlignDelay = 0 ,angleDelay = 0;
 
-    public static double angle , cooldownBasket = 0 ;
+    public static double angle , cooldownBasket = 0, clawBarDelay = 0;
     public enum LiftState {
         RETRACT,
         EXTRACT_HIGH_BASKET,
@@ -311,7 +311,7 @@ public class ReadyOpMode extends LinearOpMode {
 
                     liftState = liftState.RETARCTED_FIX_BAR;
                     cooldown = getTime();
-
+                    clawBarDelay = getTime();
 
                 }
                 break;
@@ -514,7 +514,9 @@ public class ReadyOpMode extends LinearOpMode {
 
                 if(getTime() - outtakeAlignDelay >= 300) { elevator.setTarget(0); }
 
-                if(getTime() - delayBeforeRetract >= 1000) {
+                if(getTime() - clawBarDelay >= 600) { claw.updateState(Claw.ClawState.OPEN,ClawSide.BOTH); }
+
+                if(getTime() - delayBeforeRetract >= 1200) {
 
                     canIntake = true;
                     canRetract = false;
