@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.auto.autoTracks.auto;
 
-import static org.firstinspires.ftc.teamcode.auto.ActionHelper.activateSystem;
+import static org.firstinspires.ftc.teamcode.auto.autoTracks.auto.ActionHelper.activateSystem;
 
 import androidx.annotation.NonNull;
 

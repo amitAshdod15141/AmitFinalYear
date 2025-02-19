@@ -27,6 +27,9 @@ public class AutoRedBasket extends LinearOpMode {
 
         // Define the trajectory sequence
         Action redTrajIntake = robot.drive.actionBuilder(robot.drive.pose)
+                .strafeToLinearHeading(new Vector2d(-54, -54), Math.toRadians(45))
+                // TODO: Implement action for putting the sample
+
                 .strafeToLinearHeading(new Vector2d(-48, -42), Math.toRadians(90)) // Strafe left 13 inches
                 // TODO: Implement action for taking the sample
 

@@ -1,43 +1,49 @@
 package com.example.meepmeeptesting;
 
-import com.acmerobotics.roadrunner.geometry.Pose2d;
-import org.rowlandhall.meepmeep.MeepMeep;
-import org.rowlandhall.meepmeep.roadrunner.DefaultBotBuilder;
-import org.rowlandhall.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
+import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.Vector2d;
+import com.noahbres.meepmeep.MeepMeep;
+import com.noahbres.meepmeep.roadrunner.DefaultBotBuilder;
+import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 
 public class MeepMeepTesting {
     public static void main(String[] args) {
         MeepMeep meepMeep = new MeepMeep(600);
 
-        RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
+        RoadRunnerBotEntity robot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
-                .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
-                // Set custom robot dimensions (width, length)
-                .setDimensions(14.75, 15)
-                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(-35, -62, Math.toRadians(90)))
-                        .lineToLinearHeading(new Pose2d(-48, -42, Math.toRadians(90))) // Strafe left 13 inches (sideways)
-                        .forward(1)
-                        // TODO: Here, implement the action for taking the sample
+                .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 12.75)
+                .setDimensions(14.5, 15)
+                .setStartPose(new Pose2d(-35, -62, Math.toRadians(90)))
+                .build();
 
-                        .lineToLinearHeading(new Pose2d(-54, -54, Math.toRadians(45)))
-                        // TODO: Here, implement the action for Putting the sample
+        Action redTrajIntake = robot.getDrive().actionBuilder(robot.getDrive().getPoseEstimate())
+                .strafeToLinearHeading(new Vector2d(-54, -54), Math.toRadians(45))
+                // TODO: Implement action for putting the sample
 
-                        .lineToLinearHeading(new Pose2d(-59, -42, Math.toRadians(90)))
-                        .forward(1)
-                        // TODO: Here, implement the action for taking the sample
+                .strafeToLinearHeading(new Vector2d(-48, -42), Math.toRadians(90)) // Strafe left 13 inches
+                // TODO: Implement action for taking the sample
 
-                        .lineToLinearHeading(new Pose2d(-54, -54, Math.toRadians(45)))
-                        // TODO: Here, implement the action for Putting the sample
+                .strafeToLinearHeading(new Vector2d(-54, -54), Math.toRadians(45))
+                // TODO: Implement action for putting the sample
 
-                        //here is the parking sequence:
-                        .forward(5)
-                        .lineToLinearHeading(new Pose2d(-48, -62, Math.toRadians(90)))
-                        .build());
+                .strafeToLinearHeading(new Vector2d(-59, -42), Math.toRadians(90))
+                // TODO: Implement action for taking the sample
 
-        meepMeep.setBackground(MeepMeep.Background.FIELD_INTOTHEDEEP_JUICE_DARK)
+                .strafeToLinearHeading(new Vector2d(-54, -54), Math.toRadians(45))
+                // TODO: Implement action for putting the sample
+
+                // Parking sequence:
+                .strafeToLinearHeading(new Vector2d(-48, -62), Math.toRadians(90))
+                .build();
+
+        robot.runAction(redTrajIntake);
+
+        meepMeep.setBackground(MeepMeep.Background.FIELD_INTO_THE_DEEP_JUICE_DARK)
                 .setDarkMode(true)
                 .setBackgroundAlpha(0.95f)
-                .addEntity(myBot)
+                .addEntity(robot)
                 .start();
     }
 }
