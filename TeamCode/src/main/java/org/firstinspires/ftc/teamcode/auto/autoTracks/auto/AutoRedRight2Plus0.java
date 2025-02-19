@@ -8,6 +8,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -17,7 +18,7 @@ import org.firstinspires.ftc.teamcode.auto.AutoConstants;
 import org.firstinspires.ftc.teamcode.subsystems.Claw;
 import org.firstinspires.ftc.teamcode.subsystems.Elevator;
 @Config
-@Autonomous(name = "2+0 MTI RedRight" , group = "AutoRed")
+@Autonomous(name = "3+0 RedLeft" , group = "AutoRed")
 public class AutoRedRight2Plus0 extends LinearOpMode {
     private final RobotHardware robot = RobotHardware.getInstance();
     ElapsedTime time;
@@ -49,6 +50,7 @@ public class AutoRedRight2Plus0 extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
 
+        robot.init(hardwareMap ,telemetry, autoConstants.startPoseRedLeft);
         autoConstants = new AutoConstants();
 
 
@@ -61,6 +63,23 @@ public class AutoRedRight2Plus0 extends LinearOpMode {
         Action trajRedLeft =
                 robot.drive.actionBuilder(robot.drive.pose)
 
+                        .strafeToLinearHeading(new Vector2d(-54, -54), Math.toRadians(45))
+                        // TODO: Implement action for putting the sample
+
+                        .strafeToLinearHeading(new Vector2d(-48, -42), Math.toRadians(90)) // Strafe left 13 inches
+                        // TODO: Implement action for taking the sample
+
+                        .strafeToLinearHeading(new Vector2d(-54, -54), Math.toRadians(45))
+                        // TODO: Implement action for putting the sample
+
+                        .strafeToLinearHeading(new Vector2d(-59, -42), Math.toRadians(90))
+                        // TODO: Implement action for taking the sample
+
+                        .strafeToLinearHeading(new Vector2d(-54, -54), Math.toRadians(45))
+                        // TODO: Implement action for putting the sample
+
+                        // Parking sequence:
+                        .strafeToLinearHeading(new Vector2d(-48, -62), Math.toRadians(90))
 
                         .build();
 
