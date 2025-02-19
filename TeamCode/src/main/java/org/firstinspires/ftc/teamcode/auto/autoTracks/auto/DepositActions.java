@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode.auto.autoTracks.auto;
 
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 import static org.firstinspires.ftc.teamcode.auto.autoTracks.auto.ActionHelper.activateSystem;
 
 import androidx.annotation.NonNull;
