@@ -41,15 +41,14 @@ public class ReadyOpMode extends LinearOpMode {
     public static boolean firstIntake = true , canRetract = false , stayClosed = false , canIntake = true , sampleFell = false;
     public static double cooldown = 0, COOL_DOWN = 350 , transferDelay = 0 , retractTime = 0 ,target = 0 ,  delayBeforeRetract = 0 , outtakeAlignDelay = 0 ,angleDelay = 0;
 
-    public static double angle ;
+    public static double angle , cooldownBasket = 0 ;
     public enum LiftState {
         RETRACT,
-        EXTRACT_HIGH,
-        EXTRACT_CONFIRM,
         EXTRACT_HIGH_BASKET,
         EXTRACT_LOW_BAKSET,
         HANG,
 
+        EXTRACT_BAR,
         RETRACT_INTAKE,
 
         RETARCTED_FIX_BASKET,
@@ -184,13 +183,6 @@ public class ReadyOpMode extends LinearOpMode {
                telescopicHand.setTarget(0);
 
 
-                if(betterGamepad1.BOnce())
-                {
-                    telescopicHand.setTarget(TelescopicHand.OUTTAKE_TELESCOPE);
-                    transferDelay = getTime();
-                    liftState = LiftState.EXTRACT_HIGH;
-                    canIntake = false;
-                }
 
                 if (betterGamepad1.rightBumperOnce() && canIntake) {
                     liftState = liftState.HOVER_SHORT;
@@ -206,6 +198,13 @@ public class ReadyOpMode extends LinearOpMode {
                 }
 
 
+                if(betterGamepad1.AOnce())
+                {
+                    telescopicHand.setTarget(TelescopicHand.OUTTAKE_TELESCOPE);
+                    transferDelay = getTime();
+                    liftState = liftState.EXTRACT_BAR;
+                    canIntake = false;
+                }
 
                 break;
 
@@ -241,13 +240,16 @@ public class ReadyOpMode extends LinearOpMode {
                     outtakeAlignDelay = getTime();
                 }
 
+
                 if (getTime() - retractTime >= 50 && canRetract) {
 
                     liftState = liftState.RETARCTED_FIX_BASKET;
-                    cooldown = getTime();
+                    cooldownBasket = getTime();
 
 
                 }
+
+
 
 
                 break;
@@ -268,54 +270,35 @@ public class ReadyOpMode extends LinearOpMode {
                 }
 
                 if (betterGamepad1.AOnce()) {
-                    claw.updateState(Claw.ClawState.OPEN , ClawSide.BOTH);
-                    retractTime = getTime();
-                    canRetract = true;
-                    delayBeforeRetract = getTime();
-                }
-
-                if (betterGamepad1.AOnce()) {
                     retractTime = getTime();
                     canRetract = true;
                     delayBeforeRetract = getTime();
                     outtakeAlignDelay = getTime();
                 }
+
 
                 if (getTime() - retractTime >= 50 && canRetract) {
 
                     liftState = liftState.RETARCTED_FIX_BASKET;
-                    cooldown = getTime();
+                    cooldownBasket = getTime();
 
 
                 }
+
+
 
                 break;
 
-            case EXTRACT_HIGH:
+            case EXTRACT_BAR:
 
-                claw.updateState(Claw.ClawState.CLOSED, ClawSide.BOTH);
 
-                target = elevator.HIGH_EXTRACT_LEVEL;
+                target = 1200;
 
                 elevator.setTarget(target);
 
-                if (betterGamepad1.BOnce())
-                {
-                    liftState = LiftState.EXTRACT_CONFIRM;
-                }
+                claw.setBothClaw(Claw.ClawState.CLOSED);
 
-
-                if (getTime() - transferDelay >= 300) {
-                    releaseSystem.setAngle(ReleaseSystem.Angle.OUTTAKE);
-                }
-
-                if (betterGamepad2.dpadUpOnce()) {
-                    target += 200;
-                }
-
-                if (betterGamepad2.dpadDownOnce()) {
-                    target -= 200;
-                }
+                releaseSystem.setAngle(ReleaseSystem.Angle.OUTTAKE);
 
                 if (betterGamepad1.AOnce()) {
                     retractTime = getTime();
@@ -331,38 +314,7 @@ public class ReadyOpMode extends LinearOpMode {
 
 
                 }
-
-            case EXTRACT_CONFIRM:
-
-                claw.updateState(Claw.ClawState.INTAKE ,ClawSide.BOTH);
-
-
-                target = elevator.CONFIRM_LEVEL;
-                elevator.setTarget(target);
-
-
-                if (betterGamepad2.dpadUpOnce()) {
-                    target += 200;
-                }
-
-                if (betterGamepad2.dpadDownOnce()) {
-                    target -= 200;
-                }
-
-
-                if (betterGamepad1.AOnce()) {
-                    retractTime = getTime();
-                    canRetract = true;
-                    delayBeforeRetract = getTime();
-                    outtakeAlignDelay = getTime();
-                }
-
-                if (getTime() - retractTime >= 50 && canRetract) {
-                    liftState = liftState.RETARCTED_FIX_BAR;
-                }
-
                 break;
-
             case HOVER_SHORT:
 
                 target = elevator.INTAKE_SHORT;
@@ -539,14 +491,14 @@ public class ReadyOpMode extends LinearOpMode {
 
                 claw.updateState(Claw.ClawState.OPEN,ClawSide.BOTH);
 
-                if(getTime() - cooldown >= 1300)
+                if(getTime() - cooldownBasket >= 400)
                 {
                     releaseSystem.setAngle(ReleaseSystem.Angle.INTAKE);
                 }
 
-                if(getTime() - outtakeAlignDelay >= 1600) { elevator.setTarget(0); }
+                if(getTime() - outtakeAlignDelay >= 700) { elevator.setTarget(0); }
 
-                if(getTime() - delayBeforeRetract >= 2600) {
+                if(getTime() - delayBeforeRetract >= 1400) {
 
                     canIntake = true;
                     canRetract = false;
@@ -554,10 +506,11 @@ public class ReadyOpMode extends LinearOpMode {
                     liftState = liftState.RETRACT;
                 }
 
+                break;
+
             case RETARCTED_FIX_BAR:
 
-
-                releaseSystem.setAngle(ReleaseSystem.Angle.INTAKE);
+                claw.updateState(Claw.ClawState.INTAKE,ClawSide.BOTH);
 
                 if(getTime() - outtakeAlignDelay >= 300) { elevator.setTarget(0); }
 
