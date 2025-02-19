@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode;
 
 import static com.acmerobotics.roadrunner.ftc.Actions.runBlocking;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.Vector2d;
@@ -19,7 +21,10 @@ public class AutoRedBasket extends LinearOpMode {
     RobotHardware robot = RobotHardware.getInstance();
     @Override
     public void runOpMode() {
-        robot.init(hardwareMap , telemetry, autoConstants.startPoseRedLeft);
+        Pose2d startPoseRedLeft = new Pose2d(-35, -62, Math.toRadians(90));
+
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        robot.init(hardwareMap , telemetry, startPoseRedLeft);
 
         waitForStart();
 
