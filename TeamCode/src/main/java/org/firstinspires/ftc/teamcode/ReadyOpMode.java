@@ -97,7 +97,7 @@ public class ReadyOpMode extends LinearOpMode {
 
         releaseSystem.setAngle(ReleaseSystem.Angle.INTAKE);
         releaseSystem.setAngle(ReleaseSystem.Angle.SPIN_MIDDLE);
-        claw.updateState(Claw.ClawState.OPEN , ClawSide.BOTH);
+        claw.updateState(Claw.ClawState.CLOSED , ClawSide.BOTH);
 
         elevator.setAuto(false);
         telescopicHand.setAuto(false);
@@ -391,6 +391,22 @@ public class ReadyOpMode extends LinearOpMode {
                     angle -= 2;
                 }
 
+                if(betterGamepad1.dpadUpOnce()) {
+                    releaseSystem.setAngle(ReleaseSystem.Angle.SPIN_90);
+                }
+
+                if(betterGamepad1.dpadRightOnce()) {
+                    releaseSystem.setAngle(ReleaseSystem.Angle.SPIN_45);
+                }
+
+                if(betterGamepad1.dpadLeftOnce()) {
+                    releaseSystem.setAngle(ReleaseSystem.Angle.SPIN_135);
+                }
+
+                if(betterGamepad1.dpadDownOnce()) {
+                    releaseSystem.setAngle(ReleaseSystem.Angle.SPIN_MIDDLE);
+                }
+
                     break;
 
             case HOVER_LONG:
@@ -404,6 +420,22 @@ public class ReadyOpMode extends LinearOpMode {
                 if(betterGamepad1.leftBumperOnce())
                 {
                     liftState = liftState.INTAKE_LONG;
+                }
+
+                if(betterGamepad1.dpadUpOnce()) {
+                    releaseSystem.setAngle(ReleaseSystem.Angle.SPIN_90);
+                }
+
+                if(betterGamepad1.dpadRightOnce()) {
+                    releaseSystem.setAngle(ReleaseSystem.Angle.SPIN_45);
+                }
+
+                if(betterGamepad1.dpadLeftOnce()) {
+                    releaseSystem.setAngle(ReleaseSystem.Angle.SPIN_135);
+                }
+
+                if(betterGamepad1.dpadDownOnce()) {
+                    releaseSystem.setAngle(ReleaseSystem.Angle.SPIN_MIDDLE);
                 }
                 break;
 
@@ -507,14 +539,14 @@ public class ReadyOpMode extends LinearOpMode {
 
                 claw.updateState(Claw.ClawState.OPEN,ClawSide.BOTH);
 
-                if(getTime() - cooldown >= 700)
+                if(getTime() - cooldown >= 1300)
                 {
                     releaseSystem.setAngle(ReleaseSystem.Angle.INTAKE);
                 }
 
-                if(getTime() - outtakeAlignDelay >= 1000) { elevator.setTarget(0); }
+                if(getTime() - outtakeAlignDelay >= 1600) { elevator.setTarget(0); }
 
-                if(getTime() - delayBeforeRetract >= 1700) {
+                if(getTime() - delayBeforeRetract >= 2600) {
 
                     canIntake = true;
                     canRetract = false;
