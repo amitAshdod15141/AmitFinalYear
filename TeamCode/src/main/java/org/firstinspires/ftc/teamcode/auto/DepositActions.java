@@ -1,14 +1,20 @@
 package org.firstinspires.ftc.teamcode.auto;
 
+import androidx.annotation.NonNull;
+
 import static org.firstinspires.ftc.teamcode.auto.ActionHelper.activateSystem;
 
-import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.SleepAction;
 
+import org.checkerframework.checker.units.qual.A;
 import org.firstinspires.ftc.teamcode.subsystems.Claw;
 import org.firstinspires.ftc.teamcode.subsystems.Elevator;
+
+import org.firstinspires.ftc.teamcode.subsystems.ReleaseSystem;
+import org.firstinspires.ftc.teamcode.subsystems.TelescopicHand;
 import org.firstinspires.ftc.teamcode.util.ClawSide;
 import org.firstinspires.ftc.teamcode.util.Stopwatch;
 
@@ -45,15 +51,20 @@ public class DepositActions {
 
     private Claw claw;
 
+    private ReleaseSystem releaseSystem;
+
+    private TelescopicHand telescopicHand;
     private boolean activated;
 
     ReleaseSide releaseSide;
     LockSide lockSide;
     TypeClaws typeClaws;
 
-    public DepositActions(Elevator elevator, Claw claw){
+    public DepositActions(Elevator elevator, Claw claw , TelescopicHand telescopicHand , ReleaseSystem releaseSystem) {
         this.elevator = elevator;
+        this.releaseSystem = releaseSystem;
         this.claw = claw;
+        this.telescopicHand = telescopicHand;
         typeClaws = TypeClaws.LOCKED;
         releaseSide = ReleaseSide.BOTH_OPEN;
         lockSide = LockSide.BOTH_LOCKS;
@@ -63,15 +74,20 @@ public class DepositActions {
 
 
 
-    private void moveElevatorByTraj(int elevatorTarget) {
-        elevator.setTarget(elevatorTarget);
+    private void moveElevatorByTraj(int telescopicTarget) {
+        elevator.setTarget(telescopicTarget);
         elevator.setPidControl();
     }
 
-    //This function will prepare the intake and outtake  for deposit
+    private void moveTelescopicByTraj(int telescopicTarget) {
+        telescopicHand.setTarget(telescopicTarget);
+        telescopicHand.setPidControl();
+    }
 
 
-    public void retractElevator() {
+
+    public void retractElevator()
+    {
         elevator.setTarget(0);
         elevator.setPidControl();
     }
@@ -85,13 +101,16 @@ public class DepositActions {
             this.elevator = elevator;
             readyForDepositTimer = new Stopwatch();
             readyForDepositTimer.reset();
+
         }
 
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
 
-            claw.updateState(Claw.ClawState.OPEN ,ClawSide.BOTH);
-            moveElevatorByTraj(elevator);
+
+
+
+            releaseSystem.setAngle(ReleaseSystem.Angle.OUTTAKE);
 
             return false;
         }
@@ -100,55 +119,20 @@ public class DepositActions {
 
     public class MoveOuttake implements Action {
         Stopwatch readyForDepositTimer;
+        ReleaseSystem.Angle angle;
 
+        public MoveOuttake(ReleaseSystem.Angle angle) {
+            this.angle = angle;
+        }
 
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-
+            releaseSystem.setAngle(angle);
             return false;
         }
     }
 
-    public class PlacePixel implements Action {
 
-        Stopwatch placePixelTimer;
-
-        long delay = 0;
-
-        public PlacePixel() {
-
-            placePixelTimer = new Stopwatch();
-
-            placePixelTimer.reset();
-
-            delay = 500;
-
-        }
-
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-
-            return !activateSystem(placePixelTimer, () -> claw.updateState(Claw.ClawState.OPEN ,ClawSide.BOTH), delay);
-
-
-        }
-    }
-
-        public class PlaceIntermediatePixel implements Action {
-            Stopwatch placePixelTimer;
-            long delay = 0;
-
-            public PlaceIntermediatePixel(Cycles current, long d) {
-                placePixelTimer = new Stopwatch();
-                placePixelTimer.reset();
-                delay = d;
-            }
-
-            @Override
-            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                return !activateSystem(placePixelTimer, () -> claw.updateState(Claw.ClawState.OPEN ,ClawSide.BOTH), delay);
-            }
-        }
 
 
         public class RetractDeposit implements Action {
@@ -179,13 +163,32 @@ public class DepositActions {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
 
-                moveElevatorByTraj(target);
+                elevator.setTarget(target);
+                elevator.setPidControl();
                 return false;
 
             }
         }
 
-        public class MoveClaw implements Action {
+        public class MoveTelescopic implements Action {
+        Stopwatch retractDepositTimer;
+        int target;
+
+        public MoveTelescopic(int target) {
+            this.target = target;
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+
+            moveTelescopicByTraj(target);
+            return false;
+
+        }
+    }
+
+
+    public class MoveClaw implements Action {
             private Claw.ClawState _clawState;
             private ClawSide _clawSide;
 
@@ -196,7 +199,7 @@ public class DepositActions {
 
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                claw.updateState(this._clawState ,ClawSide.BOTH);
+                claw.updateState(this._clawState, this._clawSide);
                 return false;
             }
         }
@@ -210,21 +213,23 @@ public class DepositActions {
         }
 
 
-        public Action placePixel() {
-            return new PlacePixel();
-        }
+
 
         public Action moveClaw(Claw.ClawState clawState, ClawSide clawSide) {
             return new MoveClaw(clawState, clawSide);
         }
 
-        public Action placeIntermediatePixel(Cycles currentCycle, long d) {
-            return new PlaceIntermediatePixel(currentCycle, d);
-        }
 
+        public Action moveOuttake(ReleaseSystem.Angle thisAngle) {
+            return new MoveOuttake(thisAngle);
+        }
 
         public Action moveElevator(int thisTarget) {
             return new MoveElevator(thisTarget);
+        }
+
+        public Action moveTelescopic(int thisTarget)  {
+            return new MoveTelescopic(thisTarget);
         }
 
 }

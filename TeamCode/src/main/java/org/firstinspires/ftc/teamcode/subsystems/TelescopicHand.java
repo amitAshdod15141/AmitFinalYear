@@ -113,8 +113,8 @@ public class TelescopicHand implements Subsystem
     {
         this.isAuto = isAuto;
 
-        this.telescopicMotorRight = robot.hardwareMap.get(DcMotorEx.class, "mER");
-        this.telescopicMotorLeft = robot.hardwareMap.get(DcMotorEx.class, "mEL");
+        this.telescopicMotorRight = robot.hardwareMap.get(DcMotorEx.class, "mTR");
+        this.telescopicMotorLeft = robot.hardwareMap.get(DcMotorEx.class, "mTL");
         telescopicMotorRight.setDirection(DcMotorSimple.Direction.REVERSE);
         if (isAuto)
         {
