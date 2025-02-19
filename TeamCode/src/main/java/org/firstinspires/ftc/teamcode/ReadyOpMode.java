@@ -41,7 +41,7 @@ public class ReadyOpMode extends LinearOpMode {
     public static boolean firstIntake = true , canRetract = false , stayClosed = false , canIntake = true , sampleFell = false;
     public static double cooldown = 0, COOL_DOWN = 350 , transferDelay = 0 , retractTime = 0 ,target = 0 ,  delayBeforeRetract = 0 , outtakeAlignDelay = 0 ,angleDelay = 0;
 
-    public static double angle , cooldownBasket = 0, clawBarDelay = 0;
+    public static double angle , cooldownBasket = 0, clawBarDelay = 0 , extendAngle = 0 , extendIntake = 0;
     public enum LiftState {
         RETRACT,
         EXTRACT_HIGH_BASKET,
@@ -319,6 +319,7 @@ public class ReadyOpMode extends LinearOpMode {
 
                 target = elevator.INTAKE_SHORT;
 
+
                 claw.updateState(Claw.ClawState.OPEN , ClawSide.BOTH);
 
                 elevator.setTarget(target);
@@ -334,13 +335,19 @@ public class ReadyOpMode extends LinearOpMode {
                 }
 
                 if (betterGamepad2.dpadRightOnce()) {
-                    target += 166.66;
-                    angle += 2;
+                    extendIntake = target + 166.66;
+                    extendAngle = target + 2;
+
+                    elevator.setTarget(extendIntake);
+                    elevator.setTarget(extendAngle);
                 }
 
                 if (betterGamepad2.dpadLeftOnce()) {
-                    target -= 166.66;
-                    angle -= 2;
+                    extendIntake = target - 166.66;
+                    extendAngle = target - 2;
+
+                    elevator.setTarget(extendIntake);
+                    elevator.setTarget(extendAngle);
                 }
 
                 if(betterGamepad1.dpadUpOnce()) {
@@ -374,6 +381,23 @@ public class ReadyOpMode extends LinearOpMode {
                     liftState = liftState.INTAKE_LONG;
                 }
 
+
+                if (betterGamepad2.dpadRightOnce()) {
+                    extendIntake = target + 166.66;
+                    extendAngle = target + 2;
+
+                    elevator.setTarget(extendIntake);
+                    elevator.setTarget(extendAngle);
+                }
+
+                if (betterGamepad2.dpadLeftOnce()) {
+                    extendIntake = target - 166.66;
+                    extendAngle = target - 2;
+
+                    elevator.setTarget(extendIntake);
+                    elevator.setTarget(extendAngle);
+                }
+
                 if(betterGamepad1.dpadUpOnce()) {
                     releaseSystem.setAngle(ReleaseSystem.Angle.SPIN_90);
                 }
@@ -404,13 +428,19 @@ public class ReadyOpMode extends LinearOpMode {
                 }
 
                 if (betterGamepad2.dpadRightOnce()) {
-                    target += 166.66;
-                    angle += 2;
+                    extendIntake = target + 166.66;
+                    extendAngle = target + 2;
+
+                    elevator.setTarget(extendIntake);
+                    elevator.setTarget(extendAngle);
                 }
 
                 if (betterGamepad2.dpadLeftOnce()) {
-                    target -= 166.66;
-                    angle -= 2;
+                    extendIntake = target - 166.66;
+                    extendAngle = target - 2;
+
+                    elevator.setTarget(extendIntake);
+                    elevator.setTarget(extendAngle);
                 }
 
                 if(betterGamepad1.dpadUpOnce()) {
@@ -451,13 +481,19 @@ public class ReadyOpMode extends LinearOpMode {
                 target = Elevator.INTAKE_LONG;
 
                 if (betterGamepad2.dpadRightOnce()) {
-                    target += 166.66;
-                    angle += 2;
+                    extendIntake = target + 166.66;
+                    extendAngle = target + 2;
+
+                    elevator.setTarget(extendIntake);
+                    elevator.setTarget(extendAngle);
                 }
 
                 if (betterGamepad2.dpadLeftOnce()) {
-                    target -= 166.66;
-                    angle -= 2;
+                    extendIntake = target - 166.66;
+                    extendAngle = target - 2;
+
+                    elevator.setTarget(extendIntake);
+                    elevator.setTarget(extendAngle);
                 }
 
                 if(betterGamepad1.dpadUpOnce()) {
