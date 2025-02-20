@@ -23,7 +23,7 @@ import org.firstinspires.ftc.teamcode.subsystems.ReleaseSystem;
 import org.firstinspires.ftc.teamcode.subsystems.TelescopicHand;
 import org.firstinspires.ftc.teamcode.util.ClawSide;
 
-@Autonomous(name = "RoadRunnerAutoMeepMeep", group = "Autonomous")
+@Autonomous(name = "BasketAuto 1+3", group = "Autonomous")
 public class AutoRedBasket extends LinearOpMode {
 
 
@@ -139,7 +139,7 @@ public class AutoRedBasket extends LinearOpMode {
                 .strafeToLinearHeading(new Vector2d(-51.5, -52.5), Math.toRadians(45))
 
                 .afterTime(0, releaseSampler())
-                .afterTime(2.3, closeElevator())
+                .afterTime(2.3, closeElevatorLast())
 
                 .waitSeconds(2.5)
 
@@ -187,6 +187,20 @@ public class AutoRedBasket extends LinearOpMode {
 
     }
 
+    SequentialAction closeElevatorLast() {
+
+        return new SequentialAction(
+                depositActions.moveOuttake(ReleaseSystem.Angle.INTAKE),
+                new SleepAction(0.4),
+                depositActions.moveElevator(0),
+                new SleepAction(0.8),
+                depositActions.moveTelescopic(0),
+                new SleepAction(0.5),
+                depositActions.moveClaw(Claw.ClawState.CLOSED,ClawSide.BOTH)
+
+        );
+
+    }
     SequentialAction closeIntake() {
 
         return new SequentialAction(
