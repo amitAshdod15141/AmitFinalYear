@@ -35,18 +35,19 @@ public class AutoRedBasket extends LinearOpMode {
 
     ReleaseSystem releaseSystem;
 
-  DepositActions depositActions;
+    DepositActions depositActions;
     UpdateActions updateActions;
 
 
     public AutoConstants autoConstants;
     RobotHardware robot = RobotHardware.getInstance();
+
     @Override
     public void runOpMode() {
         Pose2d startPoseRedLeft = new Pose2d(-35, -62, Math.toRadians(90));
 
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        robot.init(hardwareMap , telemetry, startPoseRedLeft);
+        robot.init(hardwareMap, telemetry, startPoseRedLeft);
 
         elevator = new Elevator(true);
 
@@ -59,43 +60,11 @@ public class AutoRedBasket extends LinearOpMode {
 
         elevator.setAuto(true);
 
-        depositActions = new DepositActions(elevator , claw, telescopicHand , releaseSystem);
-        updateActions = new UpdateActions(elevator, claw ,telescopicHand , releaseSystem);
+        depositActions = new DepositActions(elevator, claw, telescopicHand, releaseSystem);
+        updateActions = new UpdateActions(elevator, claw, telescopicHand, releaseSystem);
 
 
-
-
-        SequentialAction intakeSample = new SequentialAction(
-
-                depositActions.moveElevator(1000),
-                new SleepAction(0.2),
-                depositActions.moveTelescopic(-6),
-                new SleepAction(0.2),
-                depositActions.moveClaw(Claw.ClawState.CLOSED, ClawSide.BOTH)
-
-        );
-
-
-        SequentialAction retractIntake = new SequentialAction(
-
-                depositActions.moveTelescopic(0),
-                new SleepAction(0.2),
-                depositActions.moveElevator(0)
-
-        );
-
-        SequentialAction releaseSample = new SequentialAction(
-
-                depositActions.moveTelescopic(97),
-                new SleepAction(0.5),
-                new InstantAction(() -> depositActions.moveElevator(3700)),
-                new SleepAction(0.2),
-                depositActions.moveOuttake(ReleaseSystem.Angle.OUTTAKE),
-                new SleepAction(0.2),
-                depositActions.moveClaw(Claw.ClawState.OPEN, ClawSide.BOTH)
-        );
-
-        SequentialAction retractElevator = new SequentialAction(
+        SequentialAction retractElevatorPark = new SequentialAction(
 
                 depositActions.moveOuttake(ReleaseSystem.Angle.INTAKE),
                 new SleepAction(0.4),
@@ -108,13 +77,13 @@ public class AutoRedBasket extends LinearOpMode {
 
         while (opModeInInit() && !isStopRequested()) {
 
-            claw.updateState(Claw.ClawState.CLOSED,ClawSide.BOTH);
+            claw.updateState(Claw.ClawState.CLOSED, ClawSide.BOTH);
             releaseSystem.setAngle(ReleaseSystem.Angle.INTAKE);
+            releaseSystem.setAngle(ReleaseSystem.Angle.SPIN_MIDDLE);
 
         }
 
         waitForStart();
-
 
 
         if (isStopRequested()) return;
@@ -122,36 +91,61 @@ public class AutoRedBasket extends LinearOpMode {
         // Define the trajectory sequence
         Action redTrajIntake = robot.drive.actionBuilder(startPoseRedLeft)
                 .strafeToLinearHeading(new Vector2d(-54, -54), Math.toRadians(45))
-                .afterTime(0.2 , releaseSample)
-               // .afterTime(0.7 , retractElevator)
+                .afterTime(0.1, releaseSampler())
+                .afterTime(2.4, closeElevator())
                 // TODO: Implement action for putting the sample
 
-                /*
-                .strafeToLinearHeading(new Vector2d(-48, -42), Math.toRadians(90)) // Strafe left 13 inches
+
+                .waitSeconds(2.3)
+                .strafeToLinearHeading(new Vector2d(-46, -41.5), Math.toRadians(90)) // Strafe left 13 inches
                 // TODO: Implement action for taking the sample
 
-                .afterTime(0.7 , intakeSample)
-                .afterTime(0.2, retractIntake)
 
+                .afterTime(0.7, intakeSample(-4))
+                .afterTime(1.7, closeIntake())
+
+                .waitSeconds(2)
+                .afterTime(1.2, releaseSampler())
+                .afterTime(3.4, closeElevator())
                 .strafeToLinearHeading(new Vector2d(-54, -54), Math.toRadians(45))
-                // TODO: Implement action for putting the sample
-                .afterTime(0.2 , releaseSample)
-                .afterTime(0.7 , retractElevator)
 
-                .strafeToLinearHeading(new Vector2d(-59, -42), Math.toRadians(90))
-                .afterTime(1 , intakeSample)
-                .afterTime(0.2, retractIntake)
-                // TODO: Implement action for taking the sample
-
-                .strafeToLinearHeading(new Vector2d(-54, -54), Math.toRadians(45))
-                .afterTime(0.2 , releaseSample)
-                .afterTime(0.7 , retractElevator)
                 // TODO: Implement action for putting the sample
 
-                // Parking sequence:
-                .strafeToLinearHeading(new Vector2d(-48, -62), Math.toRadians(90))
+                .waitSeconds(2)
 
-                 */
+
+                .strafeToLinearHeading(new Vector2d(-55, -42), Math.toRadians(90))
+
+                .afterTime(1, intakeSample(-5))
+                .afterTime(1.6, closeIntake())
+
+                .waitSeconds(2)
+
+                .strafeToLinearHeading(new Vector2d(-54, -54), Math.toRadians(45))
+                .afterTime(0.2, releaseSampler())
+
+                .afterTime(3, closeElevator())
+
+                .waitSeconds(2.5)
+
+
+                .afterTime(1.5, intakeSample(-5))
+                .afterTime(2.8, closeIntake())
+
+                .strafeToLinearHeading(new Vector2d(-53.9, -38.5), Math.toRadians(120))
+
+                .waitSeconds(2)
+
+                .strafeToLinearHeading(new Vector2d(-51.5, -52.5), Math.toRadians(45))
+
+                .afterTime(0, releaseSampler())
+                .afterTime(2.3, closeElevator())
+
+                .waitSeconds(2.5)
+
+                .strafeToLinearHeading(new Vector2d(-48, -60), Math.toRadians(92))
+
+
                 .build();
 
         // Follow the trajectory sequence
@@ -163,5 +157,58 @@ public class AutoRedBasket extends LinearOpMode {
 
         telemetry.addData("Status", "Autonomous Complete");
         telemetry.update();
+    }
+
+    SequentialAction releaseSampler() {
+
+        return new SequentialAction(
+                depositActions.moveTelescopic(97),
+                new SleepAction(0.5),
+                depositActions.moveElevator(3700),
+                new SleepAction(0.3),
+                depositActions.moveOuttake(ReleaseSystem.Angle.OUTTAKE),
+                new SleepAction(1),
+                depositActions.moveClaw(Claw.ClawState.OPEN, ClawSide.BOTH)
+
+        );
+
+    }
+
+    SequentialAction closeElevator() {
+
+        return new SequentialAction(
+                depositActions.moveOuttake(ReleaseSystem.Angle.INTAKE),
+                new SleepAction(0.4),
+                depositActions.moveElevator(0),
+                new SleepAction(0.8),
+                depositActions.moveTelescopic(0)
+
+        );
+
+    }
+
+    SequentialAction closeIntake() {
+
+        return new SequentialAction(
+
+                depositActions.moveClaw(Claw.ClawState.CLOSED, ClawSide.BOTH),
+                new SleepAction(0.5),
+                depositActions.moveTelescopic(0),
+                new SleepAction(0.2),
+                depositActions.moveElevator(0)
+
+        );
+
+    }
+
+    SequentialAction intakeSample( int angle) {
+          return new SequentialAction(
+
+                depositActions.moveElevator(1000),
+                new SleepAction(0.4),
+                depositActions.moveTelescopic(angle)
+
+        );
+
     }
 }

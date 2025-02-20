@@ -85,6 +85,8 @@ public class Elevator implements Subsystem
         this.isAuto = isAuto;
 
         this.elevatorMotor = robot.hardwareMap.get(DcMotorEx.class, "mE");
+        this.elevatorMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
 
         if (isAuto)
         {
@@ -93,7 +95,6 @@ public class Elevator implements Subsystem
         }
         else
         {
-            elevatorMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             elevatorMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
         this.elevatorMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -156,6 +157,9 @@ public class Elevator implements Subsystem
 
         elevatorMotor.setPower(controller.update());
     }
+
+
+
 
     public void setTarget(double target)
     {

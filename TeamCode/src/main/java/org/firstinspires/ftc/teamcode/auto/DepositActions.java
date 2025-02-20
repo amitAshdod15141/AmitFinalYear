@@ -74,8 +74,8 @@ public class DepositActions {
 
 
 
-    private void moveElevatorByTraj(int telescopicTarget) {
-        elevator.setTarget(telescopicTarget);
+    private void moveElevatorByTraj(int elevatorTarget) {
+        elevator.setTarget(elevatorTarget);
         elevator.setPidControl();
     }
 
@@ -162,9 +162,7 @@ public class DepositActions {
 
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-
-                elevator.setTarget(target);
-                elevator.setPidControl();
+                moveElevatorByTraj(target);
                 return false;
 
             }
