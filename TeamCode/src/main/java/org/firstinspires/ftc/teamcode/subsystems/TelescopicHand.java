@@ -24,7 +24,7 @@ public class TelescopicHand implements Subsystem
     public static double kPR = 0.0075, kIR = 0, kDR = 0.01;
     public static double kPL = 0.005, kIL = 0, kDL = 0.01;
 
-    public static double OUTTAKE_TELESCOPE = 97 , RETARCT_TELESCOPE = 0 , INTAKE_LONG = -3 , INTAKE_SHORT = -6;
+    public static double OUTTAKE_TELESCOPE = 97 , RETARCT_TELESCOPE = 0 , INTAKE_LONG = -3 , INTAKE_SHORT = -6 , INTAKE_SPECIMAN = -1.5 , RETRACT_SPECIMEN = 5;
 
 
 

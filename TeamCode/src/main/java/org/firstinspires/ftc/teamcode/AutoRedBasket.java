@@ -132,14 +132,14 @@ public class AutoRedBasket extends LinearOpMode {
                 .afterTime(1.5, intakeSample(-5))
                 .afterTime(2.8, closeIntake())
 
-                .strafeToLinearHeading(new Vector2d(-53.9, -38.5), Math.toRadians(120))
+                .strafeToLinearHeading(new Vector2d(-55, -38.8), Math.toRadians(120))
 
                 .waitSeconds(2)
 
                 .strafeToLinearHeading(new Vector2d(-51.5, -52.5), Math.toRadians(45))
 
                 .afterTime(0, releaseSampler())
-                .afterTime(2.3, closeElevatorLast())
+                .afterTime(2.3, closeElevator())
 
                 .waitSeconds(2.5)
 
@@ -187,20 +187,6 @@ public class AutoRedBasket extends LinearOpMode {
 
     }
 
-    SequentialAction closeElevatorLast() {
-
-        return new SequentialAction(
-                depositActions.moveOuttake(ReleaseSystem.Angle.INTAKE),
-                new SleepAction(0.4),
-                depositActions.moveElevator(0),
-                new SleepAction(0.8),
-                depositActions.moveTelescopic(0),
-                new SleepAction(0.5),
-                depositActions.moveClaw(Claw.ClawState.CLOSED,ClawSide.BOTH)
-
-        );
-
-    }
     SequentialAction closeIntake() {
 
         return new SequentialAction(

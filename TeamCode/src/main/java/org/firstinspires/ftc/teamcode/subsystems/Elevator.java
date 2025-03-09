@@ -161,7 +161,7 @@ public class Elevator implements Subsystem
 
 
 
-    public void setTarget(double target)
+    public double setTarget(double target)
     {
         if(target > MAX_HEIGHT)
         {
@@ -171,6 +171,7 @@ public class Elevator implements Subsystem
         {
             this.currentTarget = target;
         }
+        return target;
     }
     //Move elevator for auto
     public void move(double target)
