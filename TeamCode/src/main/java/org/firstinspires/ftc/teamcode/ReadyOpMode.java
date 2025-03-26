@@ -185,6 +185,7 @@ public class ReadyOpMode extends LinearOpMode {
                 releaseSystem.setAngle(ReleaseSystem.Angle.SPIN_MIDDLE);
                 elevator.setTarget(0);
 
+                drivetrain.fast();
 
                 if (stayClosed) {
                     claw.updateState(Claw.ClawState.CLOSED, ClawSide.BOTH);
@@ -204,6 +205,7 @@ public class ReadyOpMode extends LinearOpMode {
                     transferDelay = getTime();
                     liftState = LiftState.EXTRACT_HIGH_BASKET;
                     canIntake = false;
+                    drivetrain.superSlow();
                 }
 
 
@@ -212,6 +214,7 @@ public class ReadyOpMode extends LinearOpMode {
                     transferDelay = getTime();
                     liftState = liftState.EXTRACT_BAR;
                     canIntake = false;
+                    drivetrain.superSlow();
                 }
 
                 break;
@@ -222,6 +225,7 @@ public class ReadyOpMode extends LinearOpMode {
                 claw.updateState(Claw.ClawState.CLOSED, ClawSide.BOTH);
 
                 if (betterGamepad1.YOnce()) {
+                    drivetrain.superSlow();
                     liftState = LiftState.EXTRACT_LOW_BAKSET;
                 }
 
@@ -229,7 +233,6 @@ public class ReadyOpMode extends LinearOpMode {
 
                 elevator.setTarget(target);
 
-                drivetrain.superSlow();
 
                 if (getTime() - transferDelay >= 300) {
                     releaseSystem.setAngle(ReleaseSystem.Angle.OUTTAKE);
@@ -271,7 +274,6 @@ public class ReadyOpMode extends LinearOpMode {
                     liftState = LiftState.EXTRACT_HIGH_BASKET;
                 }
 
-                drivetrain.superSlow();
                 elevator.setTarget(Elevator.LOW_BASKET_LEVEL);
 
                 if (getTime() - transferDelay >= 300) {
@@ -327,12 +329,11 @@ public class ReadyOpMode extends LinearOpMode {
                 break;
             case HOVER_SHORT:
 
-                target = elevator.INTAKE_SHORT;
-
-
                 claw.updateState(Claw.ClawState.OPEN, ClawSide.BOTH);
 
-                elevator.setTarget(target);
+                target = elevator.INTAKE_SHORT;
+
+                elevator.setTarget(elevator.setTarget(target + (openedXTimes * (Elevator.ELEVATOR_INCREMENT))));
 
                 if (betterGamepad1.rightBumperOnce()) {
                     liftState = liftState.INTAKE_SHORT;
@@ -343,13 +344,15 @@ public class ReadyOpMode extends LinearOpMode {
                 }
 
 
+                if(betterGamepad1.shareOnce()) {
+                    openedXTimes = 0;
+                }
 
-
-            if(betterGamepad1.AOnce())
+                if(betterGamepad1.AOnce())
                 {
-                liftState = liftState.INTAKE_SPECIMEN;
+                    liftState = liftState.INTAKE_SPECIMEN;
                     angleDelay = getTime();
-             }
+                }
 
 
             if (betterGamepad1.dpadUpOnce()) {
@@ -377,9 +380,9 @@ public class ReadyOpMode extends LinearOpMode {
                     liftState = liftState.INTAKE_SPECIMEN;
                     angleDelay = getTime();
                 }
-
                 target = elevator.INTAKE_LONG;
 
+                elevator.setTarget(elevator.setTarget(target + (openedXTimes * (Elevator.ELEVATOR_INCREMENT))));
                 claw.updateState(Claw.ClawState.OPEN, ClawSide.BOTH);
 
                 elevator.setTarget(target);
@@ -388,6 +391,9 @@ public class ReadyOpMode extends LinearOpMode {
                     liftState = liftState.INTAKE_LONG;
                 }
 
+                if(betterGamepad1.shareOnce()) {
+                    openedXTimes = 0;
+                }
 
                 if (betterGamepad1.dpadUpOnce()) {
                     releaseSystem.setAngle(ReleaseSystem.Angle.SPIN_90);
@@ -410,9 +416,8 @@ public class ReadyOpMode extends LinearOpMode {
 
 
                 if (getTime() - angleDelay >= 600) {
-                    target = elevator.INTAKE_SHORT;
-
-                    elevator.setTarget(elevator.setTarget(target + (openedXTimes * (Elevator.ELEVATOR_INCREMENT))));
+                    angle = telescopicHand.INTAKE_SHORT;
+                    telescopicHand.setTarget(angle + (openedXTimes * (TelescopicHand.ANGLE_INCERMENT)));
                 }
 
                 if (betterGamepad1.dpadUpOnce()) {
@@ -448,9 +453,8 @@ public class ReadyOpMode extends LinearOpMode {
             case INTAKE_LONG:
 
                 if (getTime() - angleDelay >= 600) {
-                    target = elevator.INTAKE_LONG;
-
-                    elevator.setTarget(elevator.setTarget(target + (openedXTimes * (Elevator.ELEVATOR_INCREMENT))));
+                    angle = telescopicHand.INTAKE_LONG;
+                    telescopicHand.setTarget(angle + (openedXTimes * (TelescopicHand.ANGLE_INCERMENT)));
                 }
 
                 if (betterGamepad2.dpadRightOnce()) {
@@ -458,11 +462,10 @@ public class ReadyOpMode extends LinearOpMode {
                    claw.updateState(Claw.ClawState.OPEN, ClawSide.BOTH);
                 }
 
-                if (betterGamepad2.dpadLeftOnce()) {
 
-
+                if(betterGamepad1.shareOnce()) {
+                    openedXTimes = 0;
                 }
-
 
                 if (betterGamepad1.dpadUpOnce()) {
                     releaseSystem.setAngle(ReleaseSystem.Angle.SPIN_90);
@@ -498,15 +501,15 @@ public class ReadyOpMode extends LinearOpMode {
 
                 claw.updateState(Claw.ClawState.OPEN, ClawSide.BOTH);
 
-                if (getTime() - cooldownBasket >= 400) {
+                if (getTime() - cooldownBasket >= 500) {
                     releaseSystem.setAngle(ReleaseSystem.Angle.INTAKE);
                 }
 
-                if (getTime() - outtakeAlignDelay >= 700) {
+                if (getTime() - outtakeAlignDelay >= 800) {
                     elevator.setTarget(0);
                 }
 
-                if (getTime() - delayBeforeRetract >= 1400) {
+                if (getTime() - delayBeforeRetract >= 1500) {
 
                     canIntake = true;
                     canRetract = false;
